@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import Link from 'next/link'
 import { searchArchive } from '@/lib/supabase'
 import { WeekSection } from '@/app/components/WeekSection'
 import { SearchBar } from '@/app/components/SearchBar'
@@ -33,12 +34,12 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
     <div className="min-h-screen flex flex-col relative z-10">
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
 
-        <a
+        <Link
           href="/"
           className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-[#6F00FF] transition-colors mb-10"
         >
           ← This Week&apos;s Feed
-        </a>
+        </Link>
 
         <div className="mb-8">
           <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] block mb-2">
@@ -81,14 +82,22 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
                 <span className="text-zinc-400">&ldquo;{query}&rdquo;</span>
               </p>
             )}
-            {weeks.map((weekStart, i) => (
+            {weeks.map((weekStart) => (
               <WeekSection
                 key={weekStart}
                 weekStart={weekStart}
                 stories={grouped.get(weekStart)!}
-                defaultOpen={i === 0}
+                defaultOpen
               />
             ))}
+            <div className="pt-4">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-[#6F00FF] transition-colors"
+              >
+                ← This Week&apos;s Feed
+              </Link>
+            </div>
           </div>
         )}
       </main>
