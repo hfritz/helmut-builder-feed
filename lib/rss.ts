@@ -15,15 +15,24 @@ function decodeEntities(str: string): string {
 }
 
 const RSS_SOURCES = [
+  // AI & Tech news
   { name: 'MIT Technology Review', url: 'https://www.technologyreview.com/feed/' },
   { name: 'TechCrunch AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/' },
   { name: 'The Verge', url: 'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml' },
-  { name: 'Hacker News', url: 'https://hnrss.org/frontpage?q=AI' },
+  { name: 'Hacker News', url: 'https://hnrss.org/frontpage?q=AI+vibe+coding+design' },
+  // Product management
   { name: 'Aha.io', url: 'https://www.aha.io/blog/feed.xml' },
   { name: 'ProductBoard', url: 'https://www.productboard.com/feed' },
-  { name: 'Atlassian', url: 'https://www.atlassian.com/blog/rss' },
   { name: "Lenny's Newsletter", url: 'https://www.lennysnewsletter.com/feed' },
   { name: 'Product Hunt', url: 'https://www.producthunt.com/feed' },
+  // Vibe coding & AI dev tools
+  { name: 'Vercel Blog', url: 'https://vercel.com/atom' },
+  { name: 'GitHub Blog', url: 'https://github.blog/feed/' },
+  { name: 'Simon Willison', url: 'https://simonwillison.net/atom/entries/' },
+  { name: 'The Pragmatic Engineer', url: 'https://newsletter.pragmaticengineer.com/feed' },
+  // AI design
+  { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/feed/' },
+  { name: 'UX Collective', url: 'https://uxdesign.cc/feed' },
 ]
 
 const parser = new XMLParser({

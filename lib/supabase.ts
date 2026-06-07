@@ -64,7 +64,7 @@ export async function searchArchive(query: string): Promise<Story[]> {
     .limit(60)
 
   if (q) {
-    const VALID_TAGS = ['AI Tools', 'Strategy', 'LLMs', 'Product Management', 'Launch', 'Research', 'Funding', 'Workflows', 'Agents']
+    const VALID_TAGS = ['AI Tools', 'Strategy', 'LLMs', 'Product Management', 'Launch', 'Research', 'Funding', 'Workflows', 'Agents', 'AI Design', 'Vibe Coding', 'Dev Tools']
     const matchingTags = VALID_TAGS.filter((t) => t.toLowerCase().includes(q.toLowerCase()))
     const conditions = [
       `title.ilike.%${q}%`,

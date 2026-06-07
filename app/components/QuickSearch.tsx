@@ -12,6 +12,9 @@ const QUICK_SEARCHES = [
   { label: 'Funding',            query: 'Funding' },
   { label: 'Workflows',          query: 'Workflows' },
   { label: 'Product Management', query: 'Product Management' },
+  { label: 'AI Design',          query: 'AI Design' },
+  { label: 'Vibe Coding',        query: 'Vibe Coding' },
+  { label: 'Dev Tools',          query: 'Dev Tools' },
 ]
 
 const TAG_COLORS: Record<string, string> = {
@@ -24,6 +27,9 @@ const TAG_COLORS: Record<string, string> = {
   'Funding':            'hover:bg-yellow-500/20 hover:text-yellow-300 data-[active=true]:bg-yellow-500/20 data-[active=true]:text-yellow-300 data-[active=true]:border-yellow-500/40',
   'Workflows':          'hover:bg-pink-500/20 hover:text-pink-300 data-[active=true]:bg-pink-500/20 data-[active=true]:text-pink-300 data-[active=true]:border-pink-500/40',
   'Product Management': 'hover:bg-emerald-500/20 hover:text-emerald-300 data-[active=true]:bg-emerald-500/20 data-[active=true]:text-emerald-300 data-[active=true]:border-emerald-500/40',
+  'AI Design':          'hover:bg-rose-500/20 hover:text-rose-300 data-[active=true]:bg-rose-500/20 data-[active=true]:text-rose-300 data-[active=true]:border-rose-500/40',
+  'Vibe Coding':        'hover:bg-lime-500/20 hover:text-lime-300 data-[active=true]:bg-lime-500/20 data-[active=true]:text-lime-300 data-[active=true]:border-lime-500/40',
+  'Dev Tools':          'hover:bg-teal-500/20 hover:text-teal-300 data-[active=true]:bg-teal-500/20 data-[active=true]:text-teal-300 data-[active=true]:border-teal-500/40',
 }
 
 export function QuickSearch() {

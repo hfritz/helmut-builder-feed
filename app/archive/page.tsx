@@ -43,7 +43,7 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
   const weeks = [...grouped.keys()].sort((a, b) => b.localeCompare(a))
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] flex flex-col">
+    <div className="min-h-screen flex flex-col relative z-10">
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
 
         {/* Back nav */}

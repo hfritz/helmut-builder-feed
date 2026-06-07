@@ -10,6 +10,9 @@ const TAG_COLORS: Record<string, { bg: string; text: string }> = {
   'Funding':            { bg: 'bg-yellow-500/15',  text: 'text-yellow-400' },
   'Workflows':          { bg: 'bg-pink-500/15',    text: 'text-pink-400' },
   'Agents':             { bg: 'bg-indigo-500/15',  text: 'text-indigo-400' },
+  'AI Design':          { bg: 'bg-rose-500/15',    text: 'text-rose-400' },
+  'Vibe Coding':        { bg: 'bg-lime-500/15',    text: 'text-lime-400' },
+  'Dev Tools':          { bg: 'bg-teal-500/15',    text: 'text-teal-400' },
 }
 
 const DEFAULT_TAG = { bg: 'bg-[#6F00FF]/15', text: 'text-[#6F00FF]' }

@@ -20,7 +20,7 @@ export default async function Home() {
   const lastUpdated = stories[0]?.fetched_at ?? null
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] flex flex-col">
+    <div className="min-h-screen flex flex-col relative z-10">
       <Header lastUpdated={lastUpdated} storyCount={stories.length} />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 pb-12">
