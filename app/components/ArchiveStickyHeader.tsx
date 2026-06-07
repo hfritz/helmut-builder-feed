@@ -45,13 +45,18 @@ export function ArchiveStickyHeader() {
     if (inputRef.current) inputRef.current.value = activeTag ? '' : query
   }, [query, activeTag])
 
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
-      const params = new URLSearchParams(searchParams.toString())
-      if (value) params.set('q', value)
-      else params.delete('q')
-      startTransition(() => router.replace(`/archive?${params.toString()}`, { scroll: false }))
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        const params = new URLSearchParams(searchParams.toString())
+        if (value) params.set('q', value)
+        else params.delete('q')
+        startTransition(() => router.replace(`/archive?${params.toString()}`, { scroll: false }))
+      }, 800)
     },
     [router, searchParams]
   )

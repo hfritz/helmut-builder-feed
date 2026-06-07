@@ -1,26 +1,25 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useTransition } from 'react'
+import { useCallback, useRef, useTransition } from 'react'
 
 export function SearchBar() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const query = searchParams.get('q') ?? ''
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
-      const params = new URLSearchParams(searchParams.toString())
-      if (value) {
-        params.set('q', value)
-      } else {
-        params.delete('q')
-      }
-      startTransition(() => {
-        router.replace(`/archive?${params.toString()}`)
-      })
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        const params = new URLSearchParams(searchParams.toString())
+        if (value) params.set('q', value)
+        else params.delete('q')
+        startTransition(() => router.replace(`/archive?${params.toString()}`, { scroll: false }))
+      }, 800)
     },
     [router, searchParams]
   )
