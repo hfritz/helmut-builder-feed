@@ -39,6 +39,28 @@ export default async function Home() {
         )}
       </main>
 
+      <div className="max-w-5xl w-full mx-auto px-6 pb-10">
+        <a
+          href="/archive"
+          className="group flex items-center justify-between gap-6 rounded-2xl border border-white/8 bg-white/[0.02] hover:bg-white/[0.04] hover:border-[#6F00FF]/30 px-6 py-5 transition-all"
+        >
+          <div>
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] mb-1">
+              Archive
+            </p>
+            <p className="text-white font-semibold text-base mb-0.5">
+              This isn&apos;t where it starts.
+            </p>
+            <p className="text-zinc-500 text-sm">
+              Every past digest is saved, tagged, and fully searchable — a growing library of AI × PM, week by week.
+            </p>
+          </div>
+          <span className="text-[#6F00FF] text-xl shrink-0 group-hover:translate-x-1 transition-transform">
+            →
+          </span>
+        </a>
+      </div>
+
       <div className="max-w-5xl w-full mx-auto px-6 pb-16">
         <SubscribeForm />
       </div>
