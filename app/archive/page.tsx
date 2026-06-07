@@ -4,6 +4,7 @@ import { searchArchive } from '@/lib/supabase'
 import { WeekSection } from '@/app/components/WeekSection'
 import { SearchBar } from '@/app/components/SearchBar'
 import { QuickSearch } from '@/app/components/QuickSearch'
+import { ArchiveStickyHeader } from '@/app/components/ArchiveStickyHeader'
 import { Footer } from '@/app/components/Footer'
 import type { Story } from '@/lib/types'
 
@@ -32,6 +33,9 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
 
   return (
     <div className="min-h-screen flex flex-col relative z-10">
+      <Suspense>
+        <ArchiveStickyHeader />
+      </Suspense>
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
 
         <Link
