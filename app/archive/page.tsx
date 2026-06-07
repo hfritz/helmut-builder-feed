@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { searchArchive } from '@/lib/supabase'
-import { StoryListItem } from '@/app/components/StoryListItem'
+import { WeekSection } from '@/app/components/WeekSection'
 import { SearchBar } from '@/app/components/SearchBar'
 import { QuickSearch } from '@/app/components/QuickSearch'
 import { Footer } from '@/app/components/Footer'
@@ -10,19 +10,6 @@ export const dynamic = 'force-dynamic'
 
 interface ArchivePageProps {
   searchParams: Promise<{ q?: string }>
-}
-
-function formatWeekLabel(weekStart: string): string {
-  try {
-    const date = new Date(weekStart + 'T12:00:00Z')
-    const end = new Date(date)
-    end.setDate(end.getDate() + 6)
-    const fmt = (d: Date) =>
-      new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(d)
-    return `Week of ${fmt(date)} – ${fmt(end)}, ${end.getFullYear()}`
-  } catch {
-    return `Week of ${weekStart}`
-  }
 }
 
 function groupByWeek(stories: Story[]): Map<string, Story[]> {
@@ -46,7 +33,6 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
     <div className="min-h-screen flex flex-col relative z-10">
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
 
-        {/* Back nav */}
         <a
           href="/"
           className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-[#6F00FF] transition-colors mb-10"
@@ -54,7 +40,6 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
           ← This Week&apos;s Feed
         </a>
 
-        {/* Page header */}
         <div className="mb-8">
           <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] block mb-2">
             Archive
@@ -65,7 +50,6 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
           </p>
         </div>
 
-        {/* Search */}
         <div className="mb-10 space-y-3">
           <Suspense>
             <SearchBar />
@@ -75,7 +59,6 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
           </Suspense>
         </div>
 
-        {/* Results */}
         {stories.length === 0 ? (
           <div className="text-center py-24 text-zinc-500">
             {query ? (
@@ -91,30 +74,20 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
             )}
           </div>
         ) : (
-          <div className="space-y-14">
+          <div className="space-y-6">
             {query && (
-              <p className="text-sm text-zinc-600 -mt-4 mb-2">
+              <p className="text-sm text-zinc-600">
                 {stories.length} {stories.length === 1 ? 'story' : 'stories'} matching{' '}
                 <span className="text-zinc-400">&ldquo;{query}&rdquo;</span>
               </p>
             )}
-            {weeks.map((weekStart) => (
-              <section key={weekStart}>
-                <div className="flex items-center gap-4 mb-6">
-                  <h2 className="text-sm font-semibold tracking-widest uppercase text-[#6F00FF]">
-                    {formatWeekLabel(weekStart)}
-                  </h2>
-                  <div className="flex-1 h-px bg-white/10" />
-                  <span className="text-xs text-zinc-600">
-                    {grouped.get(weekStart)!.length} stories
-                  </span>
-                </div>
-                <div className="divide-y divide-white/5">
-                  {grouped.get(weekStart)!.map((story) => (
-                    <StoryListItem key={story.id} story={story} />
-                  ))}
-                </div>
-              </section>
+            {weeks.map((weekStart, i) => (
+              <WeekSection
+                key={weekStart}
+                weekStart={weekStart}
+                stories={grouped.get(weekStart)!}
+                defaultOpen={i === 0}
+              />
             ))}
           </div>
         )}

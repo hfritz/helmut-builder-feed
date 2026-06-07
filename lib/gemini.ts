@@ -5,7 +5,7 @@ import { getWeekStart } from './supabase'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
-const VALID_TAGS = ['AI Tools', 'Strategy', 'LLMs', 'Product Management', 'Launch', 'Research', 'Funding', 'Workflows', 'Agents', 'AI Design', 'Vibe Coding', 'Dev Tools']
+const VALID_TAGS = ['AI Tools', 'Strategy', 'LLMs', 'Product Management', 'Launch', 'Research', 'Funding', 'Workflows', 'Agents', 'AI Design', 'Vibe Coding', 'Dev Tools', 'Skills & Learning']
 
 export async function summarizeAndTagStories(
   rawStories: RawStory[],
@@ -27,7 +27,8 @@ Below is a list of recent articles from tech publications. Your task:
    PM best practices in the AI era, industry news on AI products, launches, funding, or acquisitions,
    AI design tools (e.g. Claude Design, Stitch, Figma AI, Galileo), vibe coding trends and frameworks
    (spec-driven development, AI-assisted coding, tools like Cursor, Lovable, Bolt, v0),
-   and developer tools relevant to product builders.
+   developer tools relevant to product builders, AI team workflows and how teams are restructuring work
+   around AI, and skills/learning content for PMs (courses, frameworks, how to upskill for AI product work).
    Prioritise variety — pick from different sources and cover different angles of AI × PM.
 2. For each selected article, write a 2–3 sentence summary explaining why it matters specifically for product managers.
 3. Assign 2–4 tags per article from ONLY this list: ${VALID_TAGS.join(', ')}

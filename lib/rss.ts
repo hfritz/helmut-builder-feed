@@ -18,8 +18,8 @@ const RSS_SOURCES = [
   // AI & Tech news
   { name: 'MIT Technology Review', url: 'https://www.technologyreview.com/feed/' },
   { name: 'TechCrunch AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/' },
-  { name: 'The Verge', url: 'https://www.theverge.com/ai-artificial-intelligence/rss/index.xml' },
-  { name: 'Hacker News', url: 'https://hnrss.org/frontpage?q=AI+vibe+coding+design' },
+  { name: 'The Verge', url: 'https://www.theverge.com/rss/ai/index.xml' },
+  { name: 'Hacker News', url: 'https://hnrss.org/frontpage?q=AI&count=20' },
   // Product management
   { name: 'Aha.io', url: 'https://www.aha.io/blog/feed.xml' },
   { name: 'ProductBoard', url: 'https://www.productboard.com/feed' },
@@ -97,7 +97,7 @@ export async function fetchAllFeeds(): Promise<RawStory[]> {
         const xml = await res.text()
         const parsed = parser.parse(xml) as Record<string, unknown>
         const items = extractItems(parsed, name)
-        for (const item of items) {
+        for (const item of items.slice(0, 7)) {
           if (!seen.has(item.url)) {
             seen.add(item.url)
             all.push(item)
@@ -109,6 +109,6 @@ export async function fetchAllFeeds(): Promise<RawStory[]> {
     })
   )
 
-  // Return up to 30 candidates for Gemini to filter
-  return all.slice(0, 30)
+  // Give Gemini a large pool — it decides what's relevant
+  return all
 }
