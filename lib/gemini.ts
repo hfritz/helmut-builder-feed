@@ -75,6 +75,24 @@ ${articleList}`
   }
 }
 
+export async function generateDigestIntro(stories: StoryInsert[]): Promise<string> {
+  const titles = stories.map((s) => `- ${s.title} (${s.source})`).join('\n')
+
+  const prompt = `You are writing the intro paragraph for "Helmut's Builder Feed", a weekly AI × Product Management digest.
+
+This week's stories cover:
+${titles}
+
+Write a 2–3 sentence intro that synthesizes the key themes across this week's stories, speaks directly to product managers working with AI, and has a smart, energetic builder tone. Do NOT list individual articles. Respond with just the paragraph text — no quotes, no markdown.`
+
+  try {
+    const result = await model.generateContent(prompt)
+    return result.response.text().trim()
+  } catch {
+    return "This week's Builder Feed brings you the latest across AI tools, product strategy, and what's shaping the future of building with AI. Dive in."
+  }
+}
+
 /** Generates a curated weekly digest for a past week using Gemini's knowledge */
 export async function generateHistoricalWeek(weekStart: string): Promise<StoryInsert[]> {
   const weekEnd = new Date(weekStart)

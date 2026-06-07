@@ -4,6 +4,7 @@ import { summarizeAndTagStories } from '@/lib/gemini'
 import { Header } from '@/app/components/Header'
 import { Footer } from '@/app/components/Footer'
 import { StoryCard } from '@/app/components/StoryCard'
+import { SubscribeForm } from '@/app/components/SubscribeForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,6 +38,10 @@ export default async function Home() {
           </div>
         )}
       </main>
+
+      <div className="max-w-5xl w-full mx-auto px-6 pb-16">
+        <SubscribeForm />
+      </div>
 
       <Footer />
     </div>
