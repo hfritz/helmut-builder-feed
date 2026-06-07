@@ -5,7 +5,46 @@ import { getWeekStart } from './supabase'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
+const MAX_STORIES_PER_WEEK = 15
 const VALID_TAGS = ['AI Tools', 'Strategy', 'LLMs', 'Product Management', 'Launch', 'Research', 'Funding', 'Workflows', 'Agents', 'AI Design', 'Vibe Coding', 'Dev Tools', 'Skills & Learning']
+const REFUSAL_PATTERNS = [
+  'unable to generate',
+  'cannot provide',
+  'do not have access',
+  'do not have the ability',
+  'knowledge cut-off',
+  'knowledge cutoff',
+  'as an ai',
+  'future information',
+  'future news',
+]
+
+function looksLikeHistoricalStory(story: {
+  title: string
+  source: string
+  url: string
+  summary: string
+  tags: string[]
+}): boolean {
+  const text = `${story.title} ${story.source} ${story.summary}`.toLowerCase()
+  const hasRefusalText = REFUSAL_PATTERNS.some((pattern) => text.includes(pattern))
+  const tags = story.tags.filter((tag) => VALID_TAGS.includes(tag))
+
+  try {
+    const url = new URL(story.url)
+    return (
+      !hasRefusalText &&
+      story.title.trim().length > 0 &&
+      story.source.trim().length > 0 &&
+      story.summary.trim().length > 0 &&
+      tags.length > 0 &&
+      url.protocol.startsWith('http') &&
+      url.hostname.includes('.')
+    )
+  } catch {
+    return false
+  }
+}
 
 export async function summarizeAndTagStories(
   rawStories: RawStory[],
@@ -52,7 +91,7 @@ ${articleList}`
       title: string; url: string; source: string; summary: string; tags: string[]
     }>
 
-    return parsed.map((s) => ({
+    return parsed.slice(0, MAX_STORIES_PER_WEEK).map((s) => ({
       title: s.title,
       source: s.source,
       url: s.url,
@@ -63,7 +102,7 @@ ${articleList}`
     }))
   } catch (err) {
     console.error('Gemini summarization failed:', err)
-    return rawStories.slice(0, 10).map((s) => ({
+    return rawStories.slice(0, MAX_STORIES_PER_WEEK).map((s) => ({
       title: s.title,
       source: s.source,
       url: s.url,
@@ -123,15 +162,18 @@ Each object: title, url, source, summary, tags (array).`
       title: string; url: string; source: string; summary: string; tags: string[]
     }>
 
-    return parsed.map((s) => ({
-      title: s.title,
-      source: s.source,
-      url: s.url,
-      summary: s.summary,
-      tags: s.tags.filter((t) => VALID_TAGS.includes(t)),
-      published_at: weekStart,
-      batch_date: weekStart,
-    }))
+    return parsed
+      .filter(looksLikeHistoricalStory)
+      .slice(0, MAX_STORIES_PER_WEEK)
+      .map((s) => ({
+        title: s.title,
+        source: s.source,
+        url: s.url,
+        summary: s.summary,
+        tags: s.tags.filter((t) => VALID_TAGS.includes(t)),
+        published_at: weekStart,
+        batch_date: weekStart,
+      }))
   } catch (err) {
     console.error(`Gemini historical week failed for ${weekStart}:`, err)
     return []

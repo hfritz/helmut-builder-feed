@@ -17,19 +17,25 @@ const QUICK_SEARCHES = [
   { label: 'Dev Tools',          query: 'Dev Tools' },
 ]
 
-const TAG_COLORS: Record<string, string> = {
-  'AI Tools':           'hover:bg-blue-500/20 hover:text-blue-300 data-[active=true]:bg-blue-500/20 data-[active=true]:text-blue-300 data-[active=true]:border-blue-500/40',
-  'Strategy':           'hover:bg-amber-500/20 hover:text-amber-300 data-[active=true]:bg-amber-500/20 data-[active=true]:text-amber-300 data-[active=true]:border-amber-500/40',
-  'LLMs':               'hover:bg-violet-500/20 hover:text-violet-300 data-[active=true]:bg-violet-500/20 data-[active=true]:text-violet-300 data-[active=true]:border-violet-500/40',
-  'Agents':             'hover:bg-indigo-500/20 hover:text-indigo-300 data-[active=true]:bg-indigo-500/20 data-[active=true]:text-indigo-300 data-[active=true]:border-indigo-500/40',
-  'Launch':             'hover:bg-orange-500/20 hover:text-orange-300 data-[active=true]:bg-orange-500/20 data-[active=true]:text-orange-300 data-[active=true]:border-orange-500/40',
-  'Research':           'hover:bg-cyan-500/20 hover:text-cyan-300 data-[active=true]:bg-cyan-500/20 data-[active=true]:text-cyan-300 data-[active=true]:border-cyan-500/40',
-  'Funding':            'hover:bg-yellow-500/20 hover:text-yellow-300 data-[active=true]:bg-yellow-500/20 data-[active=true]:text-yellow-300 data-[active=true]:border-yellow-500/40',
-  'Workflows':          'hover:bg-pink-500/20 hover:text-pink-300 data-[active=true]:bg-pink-500/20 data-[active=true]:text-pink-300 data-[active=true]:border-pink-500/40',
-  'Product Management': 'hover:bg-emerald-500/20 hover:text-emerald-300 data-[active=true]:bg-emerald-500/20 data-[active=true]:text-emerald-300 data-[active=true]:border-emerald-500/40',
-  'AI Design':          'hover:bg-rose-500/20 hover:text-rose-300 data-[active=true]:bg-rose-500/20 data-[active=true]:text-rose-300 data-[active=true]:border-rose-500/40',
-  'Vibe Coding':        'hover:bg-lime-500/20 hover:text-lime-300 data-[active=true]:bg-lime-500/20 data-[active=true]:text-lime-300 data-[active=true]:border-lime-500/40',
-  'Dev Tools':          'hover:bg-teal-500/20 hover:text-teal-300 data-[active=true]:bg-teal-500/20 data-[active=true]:text-teal-300 data-[active=true]:border-teal-500/40',
+const TAG_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  'AI Tools':           { bg: 'bg-blue-500/15',    text: 'text-blue-400',    border: 'border-blue-500/25 hover:border-blue-500/40 data-[active=true]:border-blue-500/60' },
+  'Strategy':           { bg: 'bg-amber-500/15',   text: 'text-amber-400',   border: 'border-amber-500/25 hover:border-amber-500/40 data-[active=true]:border-amber-500/60' },
+  'LLMs':               { bg: 'bg-violet-500/15',  text: 'text-violet-400',  border: 'border-violet-500/25 hover:border-violet-500/40 data-[active=true]:border-violet-500/60' },
+  'Agents':             { bg: 'bg-indigo-500/15',  text: 'text-indigo-400',  border: 'border-indigo-500/25 hover:border-indigo-500/40 data-[active=true]:border-indigo-500/60' },
+  'Launch':             { bg: 'bg-orange-500/15',  text: 'text-orange-400',  border: 'border-orange-500/25 hover:border-orange-500/40 data-[active=true]:border-orange-500/60' },
+  'Research':           { bg: 'bg-cyan-500/15',    text: 'text-cyan-400',    border: 'border-cyan-500/25 hover:border-cyan-500/40 data-[active=true]:border-cyan-500/60' },
+  'Funding':            { bg: 'bg-yellow-500/15',  text: 'text-yellow-400',  border: 'border-yellow-500/25 hover:border-yellow-500/40 data-[active=true]:border-yellow-500/60' },
+  'Workflows':          { bg: 'bg-pink-500/15',    text: 'text-pink-400',    border: 'border-pink-500/25 hover:border-pink-500/40 data-[active=true]:border-pink-500/60' },
+  'Product Management': { bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/25 hover:border-emerald-500/40 data-[active=true]:border-emerald-500/60' },
+  'AI Design':          { bg: 'bg-rose-500/15',    text: 'text-rose-400',    border: 'border-rose-500/25 hover:border-rose-500/40 data-[active=true]:border-rose-500/60' },
+  'Vibe Coding':        { bg: 'bg-lime-500/15',    text: 'text-lime-400',    border: 'border-lime-500/25 hover:border-lime-500/40 data-[active=true]:border-lime-500/60' },
+  'Dev Tools':          { bg: 'bg-teal-500/15',    text: 'text-teal-400',    border: 'border-teal-500/25 hover:border-teal-500/40 data-[active=true]:border-teal-500/60' },
+}
+
+const DEFAULT_TAG = {
+  bg: 'bg-[#6F00FF]/15',
+  text: 'text-[#6F00FF]',
+  border: 'border-[#6F00FF]/25 hover:border-[#6F00FF]/40 data-[active=true]:border-[#6F00FF]/60',
 }
 
 export function QuickSearch() {
@@ -51,13 +57,13 @@ export function QuickSearch() {
     <div className="flex flex-wrap gap-2">
       {QUICK_SEARCHES.map(({ label, query }) => {
         const isActive = current === query
-        const colors = TAG_COLORS[label] ?? 'hover:bg-white/10 hover:text-white'
+        const colors = TAG_COLORS[label] ?? DEFAULT_TAG
         return (
           <button
             key={query}
             onClick={() => select(query)}
             data-active={isActive}
-            className={`text-xs px-3 py-1.5 rounded-full border border-white/10 text-zinc-500 transition-all cursor-pointer ${colors}`}
+            className={`text-xs ${colors.bg} ${colors.text} ${colors.border} px-3 py-1.5 rounded-full border font-medium transition-all cursor-pointer hover:-translate-y-px data-[active=true]:ring-1 data-[active=true]:ring-white/10`}
           >
             {label}
           </button>

@@ -22,6 +22,7 @@ export async function getThisWeeksStories(): Promise<Story[]> {
     .select('*')
     .eq('batch_date', weekStart)
     .order('published_at', { ascending: false, nullsFirst: false })
+    .limit(15)
 
   if (error) {
     console.error('Supabase read error:', error.message)

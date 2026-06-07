@@ -4,6 +4,7 @@ import { generateHistoricalWeek } from '@/lib/gemini'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 120
+const MIN_STORIES_PER_WEEK = 5
 
 /**
  * GET /api/seed?secret=CRON_SECRET&weeks=4
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
   const weeks = Math.min(parseInt(weeksParam ?? '4', 10), 8)
 
   const thisWeekStart = getWeekStart()
-  const results: { week: string; count: number }[] = []
+  const results: { week: string; count: number; skipped?: boolean }[] = []
 
   for (let i = 1; i <= weeks; i++) {
     const d = new Date(thisWeekStart)
@@ -28,9 +29,11 @@ export async function GET(req: NextRequest) {
     const weekStart = d.toISOString().split('T')[0]
 
     const stories = await generateHistoricalWeek(weekStart)
-    if (stories.length > 0) {
+    if (stories.length >= MIN_STORIES_PER_WEEK) {
       await saveStories(stories)
       results.push({ week: weekStart, count: stories.length })
+    } else {
+      results.push({ week: weekStart, count: stories.length, skipped: true })
     }
   }
 
