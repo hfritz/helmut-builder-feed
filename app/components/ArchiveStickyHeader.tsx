@@ -51,13 +51,13 @@ export function ArchiveStickyHeader() {
       const params = new URLSearchParams(searchParams.toString())
       if (value) params.set('q', value)
       else params.delete('q')
-      startTransition(() => router.replace(`/archive?${params.toString()}`))
+      startTransition(() => router.replace(`/archive?${params.toString()}`, { scroll: false }))
     },
     [router, searchParams]
   )
 
   function clearTag() {
-    router.replace('/archive')
+    router.replace('/archive', { scroll: false })
   }
 
   const colors = activeTag ? (TAG_COLORS[activeTag] ?? DEFAULT_TAG) : DEFAULT_TAG
