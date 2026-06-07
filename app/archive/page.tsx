@@ -1,0 +1,126 @@
+import { Suspense } from 'react'
+import { searchArchive } from '@/lib/supabase'
+import { StoryListItem } from '@/app/components/StoryListItem'
+import { SearchBar } from '@/app/components/SearchBar'
+import { QuickSearch } from '@/app/components/QuickSearch'
+import { Footer } from '@/app/components/Footer'
+import type { Story } from '@/lib/types'
+
+export const dynamic = 'force-dynamic'
+
+interface ArchivePageProps {
+  searchParams: Promise<{ q?: string }>
+}
+
+function formatWeekLabel(weekStart: string): string {
+  try {
+    const date = new Date(weekStart + 'T12:00:00Z')
+    const end = new Date(date)
+    end.setDate(end.getDate() + 6)
+    const fmt = (d: Date) =>
+      new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(d)
+    return `Week of ${fmt(date)} – ${fmt(end)}, ${end.getFullYear()}`
+  } catch {
+    return `Week of ${weekStart}`
+  }
+}
+
+function groupByWeek(stories: Story[]): Map<string, Story[]> {
+  const map = new Map<string, Story[]>()
+  for (const story of stories) {
+    const key = story.batch_date
+    if (!map.has(key)) map.set(key, [])
+    map.get(key)!.push(story)
+  }
+  return map
+}
+
+export default async function ArchivePage({ searchParams }: ArchivePageProps) {
+  const { q } = await searchParams
+  const query = q ?? ''
+  const stories = await searchArchive(query)
+  const grouped = groupByWeek(stories)
+  const weeks = [...grouped.keys()].sort((a, b) => b.localeCompare(a))
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0B] flex flex-col">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
+
+        {/* Back nav */}
+        <a
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-[#6F00FF] transition-colors mb-10"
+        >
+          ← This Week&apos;s Feed
+        </a>
+
+        {/* Page header */}
+        <div className="mb-8">
+          <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] block mb-2">
+            Archive
+          </span>
+          <h1 className="text-4xl font-bold text-white mb-2">Past Weeks</h1>
+          <p className="text-zinc-400">
+            Search through all previously curated AI × Product Management stories.
+          </p>
+        </div>
+
+        {/* Search */}
+        <div className="mb-10 space-y-3">
+          <Suspense>
+            <SearchBar />
+          </Suspense>
+          <Suspense>
+            <QuickSearch />
+          </Suspense>
+        </div>
+
+        {/* Results */}
+        {stories.length === 0 ? (
+          <div className="text-center py-24 text-zinc-500">
+            {query ? (
+              <>
+                <p className="text-lg">No stories found for &ldquo;{query}&rdquo;</p>
+                <p className="text-sm mt-2">Try a different search term.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-lg">No archived weeks yet.</p>
+                <p className="text-sm mt-2">Past weekly digests will appear here.</p>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-14">
+            {query && (
+              <p className="text-sm text-zinc-600 -mt-4 mb-2">
+                {stories.length} {stories.length === 1 ? 'story' : 'stories'} matching{' '}
+                <span className="text-zinc-400">&ldquo;{query}&rdquo;</span>
+              </p>
+            )}
+            {weeks.map((weekStart) => (
+              <section key={weekStart}>
+                <div className="flex items-center gap-4 mb-6">
+                  <h2 className="text-sm font-semibold tracking-widest uppercase text-[#6F00FF]">
+                    {formatWeekLabel(weekStart)}
+                  </h2>
+                  <div className="flex-1 h-px bg-white/10" />
+                  <span className="text-xs text-zinc-600">
+                    {grouped.get(weekStart)!.length} stories
+                  </span>
+                </div>
+                <div className="divide-y divide-white/5">
+                  {grouped.get(weekStart)!.map((story) => (
+                    <StoryListItem key={story.id} story={story} />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </main>
+
+      <Footer />
+    </div>
+  )
+}

@@ -45,9 +45,15 @@ export function Header({ lastUpdated, storyCount }: HeaderProps) {
               Stay ahead of AI × Product Management
             </p>
           </div>
-          <div className="text-right text-sm text-zinc-400 shrink-0 pb-1">
-            <div>{storyCount} stories today</div>
-            <div className="mt-1 text-zinc-500">Updated {formatDate(lastUpdated)}</div>
+          <div className="text-right text-sm shrink-0 pb-1 flex flex-col items-end gap-2">
+            <a
+              href="/archive"
+              className="text-xs font-medium tracking-widest uppercase text-zinc-400 hover:text-[#6F00FF] transition-colors border border-white/10 hover:border-[#6F00FF]/40 px-3 py-1.5 rounded-lg backdrop-blur-sm bg-black/20"
+            >
+              Archive →
+            </a>
+            <div className="text-zinc-400">{storyCount} stories this week</div>
+            <div className="text-zinc-500">Updated {formatDate(lastUpdated)}</div>
           </div>
         </div>
       </div>
