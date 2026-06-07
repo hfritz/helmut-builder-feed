@@ -21,16 +21,15 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] flex flex-col">
-      <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-12">
-        <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
-          <Header lastUpdated={lastUpdated} storyCount={stories.length} />
-        </div>
+      {/* Header is full-width, outside the content container */}
+      <Header lastUpdated={lastUpdated} storyCount={stories.length} />
 
-
+      {/* Content container */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-6 pb-12">
         {stories.length === 0 ? (
           <div className="text-center py-24 text-zinc-500">
             <p className="text-lg">No stories loaded yet.</p>
-            <p className="text-sm mt-2">Click &ldquo;Refresh Feed&rdquo; to fetch today&apos;s stories.</p>
+            <p className="text-sm mt-2">No stories for today yet — check back soon.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -40,6 +39,7 @@ export default async function Home() {
           </div>
         )}
       </main>
+
       <Footer />
     </div>
   )

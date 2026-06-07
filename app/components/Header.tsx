@@ -20,26 +20,35 @@ function formatDate(dateStr: string | null): string {
 
 export function Header({ lastUpdated, storyCount }: HeaderProps) {
   return (
-    <header className="border-b border-white/10 pb-8 mb-8">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF]">
+    <header className="relative w-full mb-10 overflow-hidden">
+      {/* Hero image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/hero.jpg')" }}
+      />
+      {/* Gradient overlay — dark at top/bottom, slightly transparent in middle */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0B] via-[#0A0A0B]/60 to-[#0A0A0B]" />
+
+      {/* Content */}
+      <div className="relative z-10 px-6 pt-16 pb-14 max-w-5xl mx-auto">
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] mb-3 block">
               AI × Product Management
             </span>
+            <h1 className="text-4xl sm:text-6xl font-bold text-white leading-tight drop-shadow-lg">
+              Helmut&apos;s{' '}
+              <span className="text-[#6F00FF]">Builder</span>{' '}
+              Feed
+            </h1>
+            <p className="mt-3 text-zinc-300 text-lg drop-shadow">
+              Stay ahead of AI × Product Management
+            </p>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white leading-tight">
-            Helmut&apos;s{' '}
-            <span className="text-[#6F00FF]">Builder</span>{' '}
-            Feed
-          </h1>
-          <p className="mt-2 text-zinc-400 text-lg">
-            Stay ahead of AI × Product Management
-          </p>
-        </div>
-        <div className="text-right text-sm text-zinc-500 shrink-0">
-          <div>{storyCount} stories today</div>
-          <div className="mt-1">Updated {formatDate(lastUpdated)}</div>
+          <div className="text-right text-sm text-zinc-400 shrink-0 pb-1">
+            <div>{storyCount} stories today</div>
+            <div className="mt-1 text-zinc-500">Updated {formatDate(lastUpdated)}</div>
+          </div>
         </div>
       </div>
     </header>
