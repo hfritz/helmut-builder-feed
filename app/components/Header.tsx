@@ -42,7 +42,7 @@ export function Header({ lastUpdated, storyCount }: HeaderProps) {
               Feed
             </h1>
             <p className="mt-3 text-zinc-300 text-lg drop-shadow">
-              Stay ahead of AI × Product Management
+              The weekly AI × PM briefing for builders who need signal, not noise.
             </p>
           </div>
           <div className="text-right text-sm shrink-0 pb-1 flex flex-col items-end gap-2">

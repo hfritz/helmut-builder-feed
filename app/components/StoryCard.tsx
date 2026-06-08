@@ -43,7 +43,7 @@ export function StoryCard({ story }: StoryCardProps) {
   return (
     <article className="bg-[#111114] border border-white/10 rounded-xl p-6 flex flex-col gap-3 hover:border-[#6F00FF]/50 transition-colors group">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold tracking-widest uppercase text-[#6F00FF]">
+        <span className="text-xs font-semibold tracking-widest uppercase text-violet-400">
           {story.source}
         </span>
         {date && (
@@ -51,8 +51,15 @@ export function StoryCard({ story }: StoryCardProps) {
         )}
       </div>
 
-      <h2 className="text-lg font-bold text-white leading-snug group-hover:text-[#6F00FF]/90 transition-colors">
-        {story.title}
+      <h2 className="text-lg font-bold leading-snug">
+        <a
+          href={story.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-white hover:text-violet-300 transition-colors"
+        >
+          {story.title}
+        </a>
       </h2>
 
       <p className="text-sm text-zinc-400 leading-relaxed flex-1">
@@ -79,7 +86,7 @@ export function StoryCard({ story }: StoryCardProps) {
         href={story.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm font-medium text-zinc-500 hover:text-[#6F00FF] transition-colors mt-1 self-start"
+        className="text-xs text-zinc-600 hover:text-violet-400 transition-colors mt-1 self-start"
       >
         Read More →
       </a>

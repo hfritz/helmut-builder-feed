@@ -2,7 +2,11 @@
 
 import { useState } from 'react'
 
-export function SubscribeForm() {
+interface SubscribeFormProps {
+  variant?: 'default' | 'compact'
+}
+
+export function SubscribeForm({ variant = 'default' }: SubscribeFormProps) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'duplicate' | 'error'>('idle')
 
@@ -29,6 +33,42 @@ export function SubscribeForm() {
     } catch {
       setStatus('error')
     }
+  }
+
+  if (variant === 'compact') {
+    return (
+      <div className="border border-white/8 rounded-xl bg-white/[0.02] px-5 py-4 mb-8">
+        {status === 'success' ? (
+          <p className="text-sm text-emerald-400">You&apos;re in! Expect the first digest next Monday.</p>
+        ) : status === 'duplicate' ? (
+          <p className="text-sm text-zinc-400">You&apos;re already subscribed.</p>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <p className="text-sm text-zinc-400 shrink-0">Get it in your inbox every Monday →</p>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <input
+                type="email"
+                required
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 sm:w-52 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#6F00FF]/60 transition-colors"
+              />
+              <button
+                type="submit"
+                disabled={status === 'loading'}
+                className="px-3 py-1.5 bg-[#6F00FF] hover:bg-[#5a00cc] disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
+              >
+                {status === 'loading' ? '...' : 'Subscribe'}
+              </button>
+            </div>
+            {status === 'error' && (
+              <p className="text-xs text-red-400">Something went wrong.</p>
+            )}
+          </form>
+        )}
+      </div>
+    )
   }
 
   return (
