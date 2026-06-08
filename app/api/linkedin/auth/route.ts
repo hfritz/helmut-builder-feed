@@ -12,7 +12,7 @@ export function GET(req: NextRequest) {
     response_type: 'code',
     client_id: process.env.LINKEDIN_CLIENT_ID!,
     redirect_uri: `${req.nextUrl.origin}/api/linkedin/callback`,
-    scope: 'openid profile w_member_social',
+    scope: 'openid profile w_member_social offline_access',
     state: process.env.CRON_SECRET!,
   })
 
