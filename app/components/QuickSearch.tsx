@@ -33,9 +33,9 @@ const TAG_COLORS: Record<string, { bg: string; text: string; border: string }> =
 }
 
 const DEFAULT_TAG = {
-  bg: 'bg-[#6F00FF]/15',
-  text: 'text-[#6F00FF]',
-  border: 'border-[#6F00FF]/25 hover:border-[#6F00FF]/40 data-[active=true]:border-[#6F00FF]/60',
+  bg: 'bg-violet-500/15',
+  text: 'text-violet-400',
+  border: 'border-violet-500/25 hover:border-violet-500/40 data-[active=true]:border-violet-500/60',
 }
 
 export function QuickSearch() {

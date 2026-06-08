@@ -15,7 +15,7 @@ const TAG_COLORS: Record<string, { bg: string; text: string }> = {
   'Dev Tools':          { bg: 'bg-teal-500/15',    text: 'text-teal-400' },
 }
 
-const DEFAULT_TAG = { bg: 'bg-[#6F00FF]/15', text: 'text-[#6F00FF]' }
+const DEFAULT_TAG = { bg: 'bg-violet-500/15', text: 'text-violet-400' }
 
 function formatDate(dateStr: string | null): string | null {
   if (!dateStr) return null
@@ -38,8 +38,8 @@ export function StoryListItem({ story }: { story: Story }) {
     >
       {/* Left: source + date */}
       <div className="shrink-0 w-28 pt-0.5 text-right hidden sm:block">
-        <span className="text-xs font-semibold text-[#6F00FF] block truncate">{story.source}</span>
-        {date && <span className="text-xs text-zinc-600 mt-0.5 block">{date}</span>}
+        <span className="text-xs font-semibold text-violet-400 block truncate">{story.source}</span>
+        {date && <span className="text-xs text-zinc-400 mt-0.5 block">{date}</span>}
       </div>
 
       {/* Divider */}
@@ -48,13 +48,13 @@ export function StoryListItem({ story }: { story: Story }) {
       {/* Right: title + summary + tags */}
       <div className="flex-1 min-w-0">
         <div className="sm:hidden flex items-center gap-2 mb-1">
-          <span className="text-xs font-semibold text-[#6F00FF]">{story.source}</span>
-          {date && <span className="text-xs text-zinc-600">{date}</span>}
+          <span className="text-xs font-semibold text-violet-400">{story.source}</span>
+          {date && <span className="text-xs text-zinc-400">{date}</span>}
         </div>
-        <h3 className="text-sm font-semibold text-white group-hover:text-[#6F00FF]/90 transition-colors leading-snug mb-1">
+        <h3 className="text-sm font-semibold text-white group-hover:text-violet-400/90 transition-colors leading-snug mb-1">
           {story.title}
         </h3>
-        <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2 mb-2">
+        <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2 mb-2">
           {story.summary}
         </p>
         <div className="flex flex-wrap gap-1.5">
@@ -70,7 +70,7 @@ export function StoryListItem({ story }: { story: Story }) {
       </div>
 
       {/* Arrow */}
-      <span className="shrink-0 text-zinc-700 group-hover:text-[#6F00FF] transition-colors text-sm pt-0.5">→</span>
+      <span className="shrink-0 text-zinc-400 group-hover:text-violet-400 transition-colors text-sm pt-0.5">→</span>
     </a>
   )
 }

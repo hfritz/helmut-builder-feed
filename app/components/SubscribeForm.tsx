@@ -44,28 +44,25 @@ export function SubscribeForm({ variant = 'default' }: SubscribeFormProps) {
         ) : status === 'duplicate' ? (
           <p className="text-sm text-zinc-400">You&apos;re already subscribed.</p>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 relative z-10">
-            <p className="text-sm font-medium text-[#6F00FF] shrink-0 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#6F00FF] shrink-0" />
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center justify-center gap-3 relative z-10 mx-auto">
+            <p className="text-sm font-medium text-violet-400 shrink-0">
               Get it in your inbox every Monday
             </p>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <input
-                type="email"
-                required
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 sm:w-52 bg-white/8 border border-[#6F00FF]/20 hover:border-[#6F00FF]/40 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#6F00FF] focus:bg-white/10 transition-all"
-              />
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="px-4 py-2 bg-[#6F00FF] hover:bg-[#7d1aff] active:scale-95 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-[#6F00FF]/20 shrink-0"
-              >
-                {status === 'loading' ? '...' : 'Subscribe'}
-              </button>
-            </div>
+            <input
+              type="email"
+              required
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-64 bg-white/8 border border-[#6F00FF]/20 hover:border-[#6F00FF]/40 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#6F00FF] focus:bg-white/10 transition-all"
+            />
+            <button
+              type="submit"
+              disabled={status === 'loading'}
+              className="px-4 py-2 bg-[#6F00FF] hover:bg-[#7d1aff] active:scale-95 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-[#6F00FF]/20 shrink-0"
+            >
+              {status === 'loading' ? '...' : 'Subscribe'}
+            </button>
             {status === 'error' && (
               <p className="text-xs text-red-400">Something went wrong.</p>
             )}
@@ -77,11 +74,11 @@ export function SubscribeForm({ variant = 'default' }: SubscribeFormProps) {
 
   return (
     <section className="border border-white/8 rounded-2xl bg-white/[0.02] px-6 py-8 text-center w-full">
-      <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] mb-2">
+      <p className="text-xs font-semibold tracking-[0.2em] uppercase text-violet-400 mb-2">
         Monday Snapshot
       </p>
       <h2 className="text-lg font-bold text-white mb-1">Get it in your inbox</h2>
-      <p className="text-sm text-zinc-500 mb-6">
+      <p className="text-sm text-zinc-400 mb-6">
         The AI × PM space moves fast and the noise is relentless. Every Monday I cut through it —
         one focused digest of what actually matters for product builders.
       </p>
@@ -98,7 +95,7 @@ export function SubscribeForm({ variant = 'default' }: SubscribeFormProps) {
             placeholder="your@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#6F00FF]/60 transition-colors"
+            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#6F00FF]/60 transition-colors"
           />
           <button
             type="submit"

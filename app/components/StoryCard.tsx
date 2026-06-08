@@ -47,7 +47,7 @@ export function StoryCard({ story }: StoryCardProps) {
           {story.source}
         </span>
         {date && (
-          <span className="text-xs text-zinc-600 shrink-0">{date}</span>
+          <span className="text-xs text-zinc-400 shrink-0">{date}</span>
         )}
       </div>
 
@@ -86,7 +86,7 @@ export function StoryCard({ story }: StoryCardProps) {
         href={story.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-xs text-zinc-600 hover:text-violet-400 transition-colors mt-1 self-start"
+        className="text-xs text-zinc-400 hover:text-violet-400 transition-colors mt-1 self-start"
       >
         Read More →
       </a>

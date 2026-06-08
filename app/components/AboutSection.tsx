@@ -6,7 +6,7 @@ export function AboutSection() {
       <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] to-white/[0.02] p-8 md:p-10">
         <div className="flex items-center gap-2 mb-6">
           <div className="w-1 h-5 bg-[#6F00FF] rounded-full" />
-          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-zinc-500">
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-zinc-400">
             Behind the Digest
           </p>
         </div>
@@ -37,7 +37,7 @@ export function AboutSection() {
             </div>
 
             <div className="flex flex-col gap-3 pt-1">
-              <p className="text-xs text-zinc-500">Learn more about me here:</p>
+              <p className="text-xs text-zinc-400">Learn more about me here:</p>
             <div className="flex flex-wrap gap-3">
               <a
                 href="https://helmutfritz.fyi/"

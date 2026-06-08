@@ -35,7 +35,7 @@ export function SearchBar() {
         onChange={handleChange}
         placeholder="Search titles, summaries, or topics…"
         className="w-full bg-[#111114] border border-white/10 rounded-xl pl-10 pr-4 py-3
-          text-white placeholder:text-zinc-600 text-sm
+          text-white placeholder:text-zinc-400 text-sm
           focus:outline-none focus:border-[#6F00FF]/60 focus:ring-1 focus:ring-[#6F00FF]/30
           transition-colors"
       />

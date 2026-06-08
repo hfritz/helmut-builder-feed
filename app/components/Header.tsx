@@ -31,9 +31,9 @@ export function Header({ lastUpdated, storyCount }: HeaderProps) {
 
       {/* Content */}
       <div className="relative z-10 px-6 pt-16 pb-14 max-w-5xl mx-auto">
-        <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] mb-3 block">
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-violet-400 mb-3 block">
               AI × Product Management
             </span>
             <h1 className="text-4xl sm:text-6xl font-bold text-white leading-tight drop-shadow-lg">
@@ -45,7 +45,7 @@ export function Header({ lastUpdated, storyCount }: HeaderProps) {
               The weekly AI × PM briefing for builders who need signal, not noise.
             </p>
           </div>
-          <div className="text-right text-sm shrink-0 pb-1 flex flex-col items-end gap-2">
+          <div className="flex flex-row flex-wrap gap-x-4 gap-y-1 sm:flex-col sm:items-end sm:gap-2 sm:text-right sm:pb-1 text-sm shrink-0">
             <a
               href="/archive"
               className="text-xs font-medium tracking-widest uppercase text-zinc-400 hover:text-[#6F00FF] transition-colors border border-white/10 hover:border-[#6F00FF]/40 px-3 py-1.5 rounded-lg backdrop-blur-sm bg-black/20"
@@ -53,7 +53,7 @@ export function Header({ lastUpdated, storyCount }: HeaderProps) {
               Archive →
             </a>
             <div className="text-zinc-400">{storyCount} stories</div>
-            <div className="text-zinc-500">Updated {formatDate(lastUpdated)}</div>
+            <div className="text-zinc-400">Updated {formatDate(lastUpdated)}</div>
           </div>
         </div>
       </div>

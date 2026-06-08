@@ -32,12 +32,12 @@ export function WeekSection({ weekStart, stories, defaultOpen = false }: WeekSec
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center gap-4 mb-0 group"
       >
-        <h2 className="text-sm font-semibold tracking-widest uppercase text-[#6F00FF] shrink-0">
+        <h2 className="text-sm font-semibold tracking-widest uppercase text-violet-400 shrink-0">
           {formatWeekLabel(weekStart)}
         </h2>
         <div className="flex-1 h-px bg-white/10 group-hover:bg-[#6F00FF]/20 transition-colors" />
-        <span className="text-xs text-zinc-600 shrink-0">{stories.length} stories</span>
-        <span className={`text-zinc-600 group-hover:text-[#6F00FF] transition-all duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}>
+        <span className="text-xs text-zinc-400 shrink-0">{stories.length} stories</span>
+        <span className={`text-zinc-400 group-hover:text-[#6F00FF] transition-all duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}>
           ▾
         </span>
       </button>

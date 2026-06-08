@@ -23,7 +23,7 @@ const TAG_COLORS: Record<string, { bg: string; text: string; border: string }> =
   'Dev Tools':          { bg: 'bg-teal-500/15',    text: 'text-teal-400',    border: 'border-teal-500/30' },
 }
 
-const DEFAULT_TAG = { bg: 'bg-[#6F00FF]/15', text: 'text-[#6F00FF]', border: 'border-[#6F00FF]/30' }
+const DEFAULT_TAG = { bg: 'bg-violet-500/15', text: 'text-violet-400', border: 'border-violet-500/30' }
 
 export function ArchiveStickyHeader() {
   const [visible, setVisible] = useState(false)
@@ -84,7 +84,7 @@ export function ArchiveStickyHeader() {
               onChange={handleChange}
               placeholder="Search archive…"
               className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-3 py-2
-                text-white placeholder:text-zinc-600 text-sm
+                text-white placeholder:text-zinc-400 text-sm
                 focus:outline-none focus:border-[#6F00FF]/60 transition-colors"
             />
             {isPending && (
