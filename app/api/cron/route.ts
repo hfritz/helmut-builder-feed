@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { deleteWeeksStories, saveStories, getWeekStart } from '@/lib/supabase'
+import { deleteWeeksStories, saveStories, saveWeeklySummary, getWeekStart } from '@/lib/supabase'
 import { fetchAllFeeds } from '@/lib/rss'
 import { summarizeAndTagStories, generateDigestIntro } from '@/lib/gemini'
 import { getActiveSubscribers } from '@/lib/subscribers'
@@ -22,12 +22,14 @@ export async function GET(req: NextRequest) {
     const summarized = await summarizeAndTagStories(raw)
     await saveStories(summarized)
 
+    const summary = await generateDigestIntro(summarized)
+    await saveWeeklySummary(weekStart, summary)
+
     console.log(`[Cron] Weekly refresh: ${summarized.length} stories for week of ${weekStart}`)
 
     const subscribers = await getActiveSubscribers()
     if (subscribers.length > 0) {
-      const intro = await generateDigestIntro(summarized)
-      await sendWeeklyDigest(summarized, intro, weekStart, subscribers)
+      await sendWeeklyDigest(summarized, summary, weekStart, subscribers)
       console.log(`[Cron] Digest sent to ${subscribers.length} subscribers`)
     }
 

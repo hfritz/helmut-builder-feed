@@ -52,6 +52,27 @@ export async function deleteWeeksStories(weekStart: string): Promise<void> {
   }
 }
 
+export async function saveWeeklySummary(weekStart: string, summary: string): Promise<void> {
+  const { error } = await supabase
+    .from('weekly_summaries')
+    .upsert({ week_start: weekStart, summary }, { onConflict: 'week_start' })
+
+  if (error) {
+    console.error('Supabase weekly summary write error:', error.message)
+  }
+}
+
+export async function getWeeklySummary(weekStart: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('weekly_summaries')
+    .select('summary')
+    .eq('week_start', weekStart)
+    .single()
+
+  if (error) return null
+  return data?.summary ?? null
+}
+
 export async function searchArchive(query: string): Promise<Story[]> {
   const weekStart = getWeekStart()
   const q = query.trim()

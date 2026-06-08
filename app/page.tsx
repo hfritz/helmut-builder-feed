@@ -1,4 +1,4 @@
-import { getThisWeeksStories, saveStories } from '@/lib/supabase'
+import { getThisWeeksStories, saveStories, getWeeklySummary, getWeekStart } from '@/lib/supabase'
 import { fetchAllFeeds } from '@/lib/rss'
 import { summarizeAndTagStories } from '@/lib/gemini'
 import { Header } from '@/app/components/Header'
@@ -19,12 +19,18 @@ export default async function Home() {
   }
 
   const lastUpdated = stories[0]?.fetched_at ?? null
+  const weekSummary = await getWeeklySummary(getWeekStart())
 
   return (
     <div className="min-h-screen flex flex-col relative z-10">
       <Header lastUpdated={lastUpdated} storyCount={stories.length} />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 pb-12">
+        {weekSummary && (
+          <p className="text-zinc-400 text-base leading-relaxed mb-8 max-w-2xl">
+            {weekSummary}
+          </p>
+        )}
         {stories.length === 0 ? (
           <div className="text-center py-24 text-zinc-500">
             <p className="text-lg">No stories this week yet.</p>
