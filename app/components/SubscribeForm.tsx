@@ -34,7 +34,7 @@ export function SubscribeForm() {
   return (
     <section className="border border-white/8 rounded-2xl bg-white/[0.02] px-6 py-8 text-center w-full">
       <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] mb-2">
-        Weekly Digest
+        Monday Snapshot
       </p>
       <h2 className="text-lg font-bold text-white mb-1">Get it in your inbox</h2>
       <p className="text-sm text-zinc-500 mb-6">

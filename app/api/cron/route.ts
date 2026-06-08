@@ -4,6 +4,7 @@ import { fetchAllFeeds } from '@/lib/rss'
 import { summarizeAndTagStories, generateDigestIntro } from '@/lib/gemini'
 import { getActiveSubscribers } from '@/lib/subscribers'
 import { sendWeeklyDigest } from '@/lib/email'
+import { postToLinkedIn } from '@/lib/linkedin'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -31,6 +32,13 @@ export async function GET(req: NextRequest) {
     if (subscribers.length > 0) {
       await sendWeeklyDigest(summarized, summary, weekStart, subscribers)
       console.log(`[Cron] Digest sent to ${subscribers.length} subscribers`)
+    }
+
+    try {
+      await postToLinkedIn(summary)
+      console.log('[Cron] LinkedIn post published')
+    } catch (err) {
+      console.error('[Cron] LinkedIn post failed:', err)
     }
 
     return NextResponse.json({ ok: true, count: summarized.length, week: weekStart, subscribers: subscribers.length })

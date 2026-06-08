@@ -117,12 +117,12 @@ ${articleList}`
 export async function generateDigestIntro(stories: StoryInsert[]): Promise<string> {
   const titles = stories.map((s) => `- ${s.title} (${s.source})`).join('\n')
 
-  const prompt = `You are writing the intro paragraph for "Helmut's Builder Feed", a weekly AI × Product Management digest.
+  const prompt = `You are writing the intro paragraph for "Helmut's Builder Feed", a curated Monday snapshot of AI × Product Management news.
 
-This week's stories cover:
+This Monday's stories cover:
 ${titles}
 
-Write a 2–3 sentence intro that synthesizes the key themes across this week's stories, speaks directly to product managers working with AI, and has a smart, energetic builder tone. Do NOT list individual articles. Respond with just the paragraph text — no quotes, no markdown.`
+Write a 2–3 sentence intro that synthesizes the key themes across this snapshot's stories, speaks directly to product managers working with AI, and has a smart, energetic builder tone. Do NOT list individual articles. Respond with just the paragraph text — no quotes, no markdown.`
 
   try {
     const result = await model.generateContent(prompt)

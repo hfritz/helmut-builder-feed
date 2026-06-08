@@ -27,14 +27,14 @@ export default async function Home() {
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 pb-12">
         {weekSummary && (
-          <p className="text-zinc-400 text-base leading-relaxed mb-8 max-w-2xl">
+          <p className="text-zinc-400 text-base leading-relaxed mb-8">
             {weekSummary}
           </p>
         )}
         {stories.length === 0 ? (
           <div className="text-center py-24 text-zinc-500">
-            <p className="text-lg">No stories this week yet.</p>
-            <p className="text-sm mt-2">Check back Monday — the digest refreshes weekly.</p>
+            <p className="text-lg">No stories yet.</p>
+            <p className="text-sm mt-2">Check back Monday — a fresh snapshot drops every week.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

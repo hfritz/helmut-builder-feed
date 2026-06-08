@@ -17,9 +17,9 @@ function formatWeekLabel(weekStart: string): string {
     end.setDate(end.getDate() + 6)
     const fmt = (d: Date) =>
       new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(d)
-    return `Week of ${fmt(date)} – ${fmt(end)}, ${end.getFullYear()}`
+    return `${fmt(date)}, ${end.getFullYear()}`
   } catch {
-    return `Week of ${weekStart}`
+    return weekStart
   }
 }
 

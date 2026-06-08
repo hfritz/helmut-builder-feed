@@ -52,7 +52,7 @@ export function Header({ lastUpdated, storyCount }: HeaderProps) {
             >
               Archive →
             </a>
-            <div className="text-zinc-400">{storyCount} stories this week</div>
+            <div className="text-zinc-400">{storyCount} stories</div>
             <div className="text-zinc-500">Updated {formatDate(lastUpdated)}</div>
           </div>
         </div>

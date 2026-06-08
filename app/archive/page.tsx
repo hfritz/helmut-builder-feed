@@ -42,14 +42,14 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
           href="/"
           className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-[#6F00FF] transition-colors mb-10"
         >
-          ← This Week&apos;s Feed
+          ← This Monday&apos;s Feed
         </Link>
 
         <div className="mb-8">
           <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#6F00FF] block mb-2">
             Archive
           </span>
-          <h1 className="text-4xl font-bold text-white mb-2">Past Weeks</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Past Editions</h1>
           <p className="text-zinc-400">
             Search through all previously curated AI × Product Management stories.
           </p>
@@ -73,8 +73,8 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
               </>
             ) : (
               <>
-                <p className="text-lg">No archived weeks yet.</p>
-                <p className="text-sm mt-2">Past weekly digests will appear here.</p>
+                <p className="text-lg">No past editions yet.</p>
+                <p className="text-sm mt-2">Past Monday snapshots will appear here.</p>
               </>
             )}
           </div>
@@ -99,7 +99,7 @@ export default async function ArchivePage({ searchParams }: ArchivePageProps) {
                 href="/"
                 className="inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-[#6F00FF] transition-colors"
               >
-                ← This Week&apos;s Feed
+                ← This Monday&apos;s Feed
               </Link>
             </div>
           </div>
