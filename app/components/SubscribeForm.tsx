@@ -37,14 +37,18 @@ export function SubscribeForm({ variant = 'default' }: SubscribeFormProps) {
 
   if (variant === 'compact') {
     return (
-      <div className="border border-white/8 rounded-xl bg-white/[0.02] px-5 py-4 mb-8">
+      <div className="relative border border-[#6F00FF]/40 rounded-xl bg-gradient-to-r from-[#6F00FF]/8 to-[#6F00FF]/4 px-6 py-5 mb-8 overflow-hidden">
+        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#6F00FF] to-[#6F00FF]/0 rounded-l-xl" />
         {status === 'success' ? (
           <p className="text-sm text-emerald-400">You&apos;re in! Expect the first digest next Monday.</p>
         ) : status === 'duplicate' ? (
           <p className="text-sm text-zinc-400">You&apos;re already subscribed.</p>
         ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <p className="text-sm text-zinc-400 shrink-0">Get it in your inbox every Monday →</p>
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 relative z-10">
+            <p className="text-sm font-medium text-[#6F00FF] shrink-0 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#6F00FF] shrink-0" />
+              Get it in your inbox every Monday
+            </p>
             <div className="flex gap-2 w-full sm:w-auto">
               <input
                 type="email"
@@ -52,12 +56,12 @@ export function SubscribeForm({ variant = 'default' }: SubscribeFormProps) {
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 sm:w-52 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#6F00FF]/60 transition-colors"
+                className="flex-1 sm:w-52 bg-white/8 border border-[#6F00FF]/20 hover:border-[#6F00FF]/40 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#6F00FF] focus:bg-white/10 transition-all"
               />
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="px-3 py-1.5 bg-[#6F00FF] hover:bg-[#5a00cc] disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors shrink-0"
+                className="px-4 py-2 bg-[#6F00FF] hover:bg-[#7d1aff] active:scale-95 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-[#6F00FF]/20 shrink-0"
               >
                 {status === 'loading' ? '...' : 'Subscribe'}
               </button>

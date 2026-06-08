@@ -5,6 +5,7 @@ import { Header } from '@/app/components/Header'
 import { Footer } from '@/app/components/Footer'
 import { StoryCard } from '@/app/components/StoryCard'
 import { SubscribeForm } from '@/app/components/SubscribeForm'
+import { AboutSection } from '@/app/components/AboutSection'
 import { Story } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
@@ -118,9 +119,11 @@ export default async function Home() {
         </a>
       </div>
 
-      <div className="max-w-5xl w-full mx-auto px-6 pb-16">
+      <div className="max-w-5xl w-full mx-auto px-6 pb-10">
         <SubscribeForm />
       </div>
+
+      <AboutSection />
 
       <Footer />
     </div>
