@@ -2,24 +2,31 @@ const TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
 const POSTS_URL = 'https://api.linkedin.com/v2/ugcPosts'
 
 async function getAccessToken(): Promise<string> {
-  const res = await fetch(TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: process.env.LINKEDIN_REFRESH_TOKEN!,
-      client_id: process.env.LINKEDIN_CLIENT_ID!,
-      client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
-    }),
-  })
-
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`LinkedIn token refresh failed: ${res.status} — ${err}`)
+  // Use refresh token if available, otherwise fall back to stored access token
+  if (process.env.LINKEDIN_REFRESH_TOKEN) {
+    const res = await fetch(TOKEN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: process.env.LINKEDIN_REFRESH_TOKEN,
+        client_id: process.env.LINKEDIN_CLIENT_ID!,
+        client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
+      }),
+    })
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(`LinkedIn token refresh failed: ${res.status} — ${err}`)
+    }
+    const data = await res.json()
+    return data.access_token as string
   }
 
-  const data = await res.json()
-  return data.access_token as string
+  if (!process.env.LINKEDIN_ACCESS_TOKEN) {
+    throw new Error('No LinkedIn credentials configured (LINKEDIN_ACCESS_TOKEN or LINKEDIN_REFRESH_TOKEN required)')
+  }
+
+  return process.env.LINKEDIN_ACCESS_TOKEN
 }
 
 export async function postToLinkedIn(summary: string): Promise<void> {

@@ -43,10 +43,10 @@ export async function GET(req: NextRequest) {
   const personUrn = `urn:li:person:${userinfo.sub}`
 
   return NextResponse.json({
-    message: 'Copy these into your Vercel environment variables, then delete these routes.',
+    message: 'Copy LINKEDIN_ACCESS_TOKEN and LINKEDIN_PERSON_URN into Vercel env vars. Token expires in ~60 days — re-run this flow when it does.',
     LINKEDIN_ACCESS_TOKEN: tokens.access_token,
-    LINKEDIN_REFRESH_TOKEN: tokens.refresh_token ?? '(not issued — token will expire in 60 days)',
     LINKEDIN_PERSON_URN: personUrn,
     expires_in_days: Math.round(tokens.expires_in / 86400),
+    refresh_token: tokens.refresh_token ?? null,
   })
 }
