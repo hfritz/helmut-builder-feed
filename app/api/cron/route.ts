@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { deleteWeeksStories, saveStories, saveWeeklySummary, getWeekStart } from '@/lib/supabase'
 import { fetchAllFeeds } from '@/lib/rss'
-import { summarizeAndTagStories, generateDigestIntro } from '@/lib/gemini'
+import { summarizeAndTagStories, generateDigestIntro, generateLinkedInHashtags } from '@/lib/gemini'
 import { getActiveSubscribers } from '@/lib/subscribers'
 import { sendWeeklyDigest } from '@/lib/email'
 import { postToLinkedIn } from '@/lib/linkedin'
@@ -35,7 +35,8 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-      await postToLinkedIn(summary)
+      const hashtags = await generateLinkedInHashtags(summarized)
+      await postToLinkedIn(summary, hashtags)
       console.log('[Cron] LinkedIn post published')
     } catch (err) {
       console.error('[Cron] LinkedIn post failed:', err)

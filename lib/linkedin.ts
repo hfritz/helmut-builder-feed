@@ -29,7 +29,7 @@ async function getAccessToken(): Promise<string> {
   return process.env.LINKEDIN_ACCESS_TOKEN
 }
 
-export async function postToLinkedIn(summary: string): Promise<void> {
+export async function postToLinkedIn(summary: string, hashtags: string): Promise<void> {
   const accessToken = await getAccessToken()
   const personUrn = process.env.LINKEDIN_PERSON_URN!
   const siteUrl = 'https://builder-feed.helmutfritz.fyi'
@@ -40,7 +40,7 @@ export async function postToLinkedIn(summary: string): Promise<void> {
     specificContent: {
       'com.linkedin.ugc.ShareContent': {
         shareCommentary: {
-          text: `${summary}\n\nThis Monday's full curated feed → ${siteUrl}`,
+          text: `${summary}\n\n${hashtags}\n\nThis Monday's full curated feed → ${siteUrl}`,
         },
         shareMediaCategory: 'ARTICLE',
         media: [{ status: 'READY', originalUrl: siteUrl }],

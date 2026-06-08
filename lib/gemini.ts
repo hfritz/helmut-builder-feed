@@ -132,6 +132,28 @@ Write a 2–3 sentence intro that synthesizes the key themes across this snapsho
   }
 }
 
+export async function generateLinkedInHashtags(stories: StoryInsert[]): Promise<string> {
+  const context = stories.map((s) => `- ${s.title} [${s.tags.join(', ')}]`).join('\n')
+
+  const prompt = `Based on these AI × Product Management stories, generate 5-6 LinkedIn hashtags.
+
+Stories:
+${context}
+
+Rules:
+- Mix 2-3 broad hashtags (#AI, #ProductManagement, #ProductStrategy) with 2-3 specific ones based on this week's themes
+- No spaces inside hashtags, CamelCase for multi-word ones
+- Return only the hashtags separated by spaces, nothing else
+- Example: #AI #ProductManagement #LLMs #AgenticAI #VibeCoding`
+
+  try {
+    const result = await model.generateContent(prompt)
+    return result.response.text().trim()
+  } catch {
+    return '#AI #ProductManagement #BuilderFeed'
+  }
+}
+
 /** Generates a curated weekly digest for a past week using Gemini's knowledge */
 export async function generateHistoricalWeek(weekStart: string): Promise<StoryInsert[]> {
   const weekEnd = new Date(weekStart)
