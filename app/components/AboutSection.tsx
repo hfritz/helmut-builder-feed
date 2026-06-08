@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export function AboutSection() {
   return (
-    <section className="max-w-5xl w-full mx-auto px-6 pb-10">
+    <section id="behind-the-digest" className="max-w-5xl w-full mx-auto px-6 pb-10">
       <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.04] to-white/[0.02] p-8 md:p-10">
         <div className="flex items-center gap-2 mb-6">
           <div className="w-1 h-5 bg-[#6F00FF] rounded-full" />

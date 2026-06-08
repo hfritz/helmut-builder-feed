@@ -6,6 +6,7 @@ import { Footer } from '@/app/components/Footer'
 import { StoryCard } from '@/app/components/StoryCard'
 import { SubscribeForm } from '@/app/components/SubscribeForm'
 import { AboutSection } from '@/app/components/AboutSection'
+import { HomeStickyNav } from '@/app/components/HomeStickyNav'
 import { Story } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
@@ -56,6 +57,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen flex flex-col relative z-10">
       <Header lastUpdated={lastUpdated} storyCount={stories.length} />
+      <HomeStickyNav sections={[...sections.map(s => s.label), 'Subscribe', 'Behind the Digest']} />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 pb-12">
         {weekSummary && (
@@ -79,7 +81,7 @@ export default async function Home() {
         ) : (
           <div className="space-y-10">
             {sections.map((section) => (
-              <section key={section.label}>
+              <section key={section.label} id={section.label.toLowerCase().replace(/\s+/g, '-')}>
                 <div className="flex items-center gap-3 mb-5">
                   <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-violet-400">
                     {section.label}
@@ -119,7 +121,7 @@ export default async function Home() {
         </a>
       </div>
 
-      <div className="max-w-5xl w-full mx-auto px-6 pb-10">
+      <div id="subscribe" className="max-w-5xl w-full mx-auto px-6 pb-10">
         <SubscribeForm />
       </div>
 
