@@ -81,7 +81,7 @@ export default async function Home() {
         ) : (
           <div className="space-y-10">
             {sections.map((section) => (
-              <section key={section.label} id={section.label.toLowerCase().replace(/\s+/g, '-')}>
+              <section key={section.label} id={section.label.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-16">
                 <div className="flex items-center gap-3 mb-5">
                   <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-violet-400">
                     {section.label}
@@ -121,7 +121,7 @@ export default async function Home() {
         </a>
       </div>
 
-      <div id="subscribe" className="max-w-5xl w-full mx-auto px-6 pb-10">
+      <div id="subscribe" className="max-w-5xl w-full mx-auto px-6 pb-10 scroll-mt-16">
         <SubscribeForm />
       </div>
 

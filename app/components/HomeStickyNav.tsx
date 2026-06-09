@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 function slugify(label: string) {
   return label.toLowerCase().replace(/\s+/g, '-')
@@ -13,6 +13,8 @@ interface HomeStickyNavProps {
 export function HomeStickyNav({ sections }: HomeStickyNavProps) {
   const [visible, setVisible] = useState(false)
   const [active, setActive] = useState<string | null>(null)
+  const clickLockRef = useRef(false)
+  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 300)
@@ -23,6 +25,7 @@ export function HomeStickyNav({ sections }: HomeStickyNavProps) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        if (clickLockRef.current) return
         for (const entry of entries) {
           if (entry.isIntersecting) {
             setActive(entry.target.id)
@@ -55,6 +58,14 @@ export function HomeStickyNav({ sections }: HomeStickyNavProps) {
               <a
                 key={id}
                 href={`#${id}`}
+                onClick={() => {
+                  setActive(id)
+                  clickLockRef.current = true
+                  if (lockTimerRef.current) clearTimeout(lockTimerRef.current)
+                  lockTimerRef.current = setTimeout(() => {
+                    clickLockRef.current = false
+                  }, 1000)
+                }}
                 className={`text-xs font-medium px-3 py-1.5 rounded-full border whitespace-nowrap transition-all shrink-0 ${
                   isActive
                     ? 'bg-violet-500/20 text-violet-300 border-violet-500/40'
