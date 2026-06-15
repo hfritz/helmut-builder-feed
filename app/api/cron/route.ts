@@ -7,7 +7,7 @@ import { sendWeeklyDigest } from '@/lib/email'
 import { postToLinkedIn } from '@/lib/linkedin'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
@@ -29,9 +29,12 @@ export async function GET(req: NextRequest) {
     console.log(`[Cron] Weekly refresh: ${summarized.length} stories for week of ${weekStart}`)
 
     const subscribers = await getActiveSubscribers()
+    console.log(`[Cron] Active subscribers: ${subscribers.length}`)
     if (subscribers.length > 0) {
       await sendWeeklyDigest(summarized, summary, weekStart, subscribers)
       console.log(`[Cron] Digest sent to ${subscribers.length} subscribers`)
+    } else {
+      console.log('[Cron] No active subscribers — skipping email send')
     }
 
     try {
