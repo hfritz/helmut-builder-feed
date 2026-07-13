@@ -1,6 +1,6 @@
 import { Resend } from 'resend'
 import type { StoryInsert } from './types'
-import { groupIntoSections } from './sections'
+import { groupIntoSections, getTopPicks } from './sections'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = "Helmut's Builder Feed <builders-feed@helmutfritz.fyi>"
@@ -84,6 +84,40 @@ function renderStory(story: StoryInsert): string {
     </div>`
 }
 
+function renderTopPicks(stories: StoryInsert[]): string {
+  const picks = getTopPicks(stories)
+  if (picks.length === 0) return ''
+
+  const rows = picks
+    .map(
+      (s, i) => `
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:${i === picks.length - 1 ? '0' : '16px'};">
+          <tr>
+            <td width="36" valign="top" style="padding-right:12px;">
+              <table border="0" cellpadding="0" cellspacing="0" style="width:32px;height:32px;background:rgba(245,158,11,0.25);border:1px solid rgba(245,158,11,0.5);border-radius:50%;">
+                <tr><td align="center" valign="middle" style="color:#fde68a;font-size:14px;font-weight:700;">${i + 1}</td></tr>
+              </table>
+            </td>
+            <td valign="middle">
+              <a href="${s.url}" style="color:#ffffff;font-weight:700;font-size:15px;line-height:1.4;text-decoration:none;">${s.title}</a>
+              <p style="color:#71717a;font-size:12px;margin:3px 0 0;">${s.source}</p>
+            </td>
+          </tr>
+        </table>`
+    )
+    .join('')
+
+  return `
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:24px 0;border:1px solid rgba(245,158,11,0.4);border-radius:14px;background:linear-gradient(135deg, rgba(245,158,11,0.14), rgba(245,158,11,0.03));">
+      <tr>
+        <td style="padding:22px 24px;">
+          <p style="color:#fcd34d;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 16px;">🔥 Top Picks This Week</p>
+          ${rows}
+        </td>
+      </tr>
+    </table>`
+}
+
 function renderSectionHeader(label: string): string {
   return `
     <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:28px 0 14px;">
@@ -138,7 +172,9 @@ export function buildEmail(stories: StoryInsert[], intro: string, weekStart: str
   const hero = heroSection('Weekly Digest', `Week of ${weekLabel}`)
   const sections = groupIntoSections(stories)
   const body = `
-    <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 28px;">${intro}</p>
+    <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 0;">${intro}</p>
+    ${renderTopPicks(stories)}
+    <div style="height:28px;"></div>
     ${sections.map((section) => `${renderSectionHeader(section.label)}${section.stories.map(renderStory).join('')}`).join('')}
     ${footer(unsubscribeUrl)}`
   return shell(`Helmut's Builder Feed — Week of ${weekLabel}`, hero, body)

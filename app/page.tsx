@@ -7,7 +7,7 @@ import { StoryCard } from '@/app/components/StoryCard'
 import { SubscribeForm } from '@/app/components/SubscribeForm'
 import { AboutSection } from '@/app/components/AboutSection'
 import { HomeStickyNav } from '@/app/components/HomeStickyNav'
-import { groupIntoSections } from '@/lib/sections'
+import { groupIntoSections, getTopPicks } from '@/lib/sections'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,11 +26,12 @@ export default async function Home() {
   const lastUpdated = stories[0]?.fetched_at ?? null
   const weekSummary = await getWeeklySummary(getWeekStart())
   const sections = groupIntoSections(stories)
+  const topPicks = getTopPicks(stories)
 
   return (
     <div className="min-h-screen flex flex-col relative z-10">
       <Header lastUpdated={lastUpdated} storyCount={stories.length} />
-      <HomeStickyNav sections={[...sections.map(s => s.label), 'Subscribe', 'Behind the Digest']} />
+      <HomeStickyNav sections={[...(topPicks.length > 0 ? ['Top Picks This Week'] : []), ...sections.map(s => s.label), 'Subscribe', 'Behind the Digest']} />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-6 pb-12">
         {weekSummary && (
@@ -41,6 +42,39 @@ export default async function Home() {
             <p className="text-zinc-300 text-base leading-relaxed">
               {weekSummary}
             </p>
+          </section>
+        )}
+
+        {topPicks.length > 0 && (
+          <section id="top-picks-this-week" className="scroll-mt-16 relative overflow-hidden border border-amber-500/40 rounded-2xl bg-gradient-to-br from-amber-500/14 via-amber-500/6 to-transparent px-6 py-6 mb-6">
+            <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-amber-500 to-amber-500/0" />
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-amber-300 mb-4">
+              🔥 Top Picks This Week
+            </p>
+            <div className="space-y-1">
+              {topPicks.map((story, i) => (
+                <a
+                  key={story.id}
+                  href={story.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-4 rounded-xl px-3 py-3 -mx-3 hover:bg-white/[0.05] transition-colors"
+                >
+                  <span className="shrink-0 w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-200 text-sm font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-bold text-base leading-snug group-hover:text-amber-300 transition-colors">
+                      {story.title}
+                    </h3>
+                    <p className="text-xs text-zinc-500 mt-0.5">{story.source}</p>
+                  </div>
+                  <span className="text-amber-400 text-lg shrink-0 group-hover:translate-x-1 transition-transform">
+                    →
+                  </span>
+                </a>
+              ))}
+            </div>
           </section>
         )}
 

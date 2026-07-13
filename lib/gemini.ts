@@ -71,6 +71,9 @@ Below is a list of recent articles from tech publications. Your task:
    Prioritise variety — pick from different sources and cover different angles of AI × PM.
 2. For each selected article, write a 2–3 sentence summary explaining why it matters specifically for product managers.
 3. Assign 2–4 tags per article from ONLY this list: ${VALID_TAGS.join(', ')}
+4. Order the array with the single most important, attention-worthy story first, then the rest by
+   descending importance. "Most important" means most consequential for a PM's actual decisions this
+   week — a major model release or a widely-relevant strategy shift outranks a minor tool update.
 
 Respond ONLY with a valid JSON array. No markdown, no explanation, no code fences.
 Each object must have exactly these fields:
@@ -115,14 +118,25 @@ ${articleList}`
 }
 
 export async function generateDigestIntro(stories: StoryInsert[]): Promise<string> {
-  const titles = stories.map((s) => `- ${s.title} (${s.source})`).join('\n')
+  const context = stories
+    .map((s, i) => `${i + 1}. ${s.title} (${s.source}): ${s.summary}`)
+    .join('\n')
 
-  const prompt = `You are writing the intro paragraph for "Helmut's Builder Feed", a curated Monday snapshot of AI × Product Management news.
+  const prompt = `You are writing the intro paragraph for "Helmut's Builder Feed", a curated Monday snapshot of AI × Product Management news, read by product managers.
 
-This Monday's stories cover:
-${titles}
+This Monday's stories, most important first:
+${context}
 
-Write a 2–3 sentence intro that synthesizes the key themes across this snapshot's stories, speaks directly to product managers working with AI, and has a smart, energetic builder tone. Do NOT list individual articles. Respond with just the paragraph text — no quotes, no markdown.`
+Write a 2–3 sentence intro with a smart, energetic builder tone. Requirements:
+- Open by naming story #1 above and the concrete, specific reason it matters — an actual product,
+  company, model, or number from its summary. No vague scene-setting like "the AI landscape is evolving."
+- Connect it to one or two other stories above through a real, specific thread (a shared theme, a
+  tension, a "meanwhile") — not a generic "and more."
+- Tell the reader what to do or watch for, not just what happened.
+- Do NOT list every story or write a bulleted recap — this stays one flowing paragraph, and do not
+  include any links or markdown.
+
+Respond with just the paragraph text — no quotes, no markdown.`
 
   try {
     const result = await model.generateContent(prompt)

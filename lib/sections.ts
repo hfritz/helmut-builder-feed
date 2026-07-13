@@ -5,6 +5,13 @@ export const SECTION_MAP: Array<{ label: string; tags: string[] }> = [
   { label: 'Watch this', tags: ['Funding'] },
 ]
 
+export const TOP_PICKS_COUNT = 3
+
+/** The most important stories, in the order Gemini ranked them — surfaced with direct links above the full list. */
+export function getTopPicks<T>(stories: T[], count: number = TOP_PICKS_COUNT): T[] {
+  return stories.slice(0, count)
+}
+
 export interface StorySection<T extends { url: string; tags: string[] }> {
   label: string
   stories: T[]
