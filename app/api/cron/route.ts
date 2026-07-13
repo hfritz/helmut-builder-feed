@@ -5,6 +5,7 @@ import { summarizeAndTagStories, generateDigestIntro, generateLinkedInHashtags }
 import { getActiveSubscribers, recordFailedSends } from '@/lib/subscribers'
 import { sendWeeklyDigest, sendFailureReport } from '@/lib/email'
 import { postToLinkedIn } from '@/lib/linkedin'
+import { citationsToPlainText } from '@/lib/citations'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     try {
       const hashtags = await generateLinkedInHashtags(summarized)
-      await postToLinkedIn(summary, hashtags)
+      await postToLinkedIn(citationsToPlainText(summary), hashtags)
       console.log('[Cron] LinkedIn post published')
     } catch (err) {
       console.error('[Cron] LinkedIn post failed:', err)

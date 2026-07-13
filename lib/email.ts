@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 import type { StoryInsert } from './types'
 import { groupIntoSections, getTopPicks } from './sections'
+import { citationsToHtml } from './citations'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = "Helmut's Builder Feed <builders-feed@helmutfritz.fyi>"
@@ -171,8 +172,12 @@ export function buildEmail(stories: StoryInsert[], intro: string, weekStart: str
   const weekLabel = formatWeekLabel(weekStart)
   const hero = heroSection('Weekly Digest', `Week of ${weekLabel}`)
   const sections = groupIntoSections(stories)
+  const introHtml = citationsToHtml(
+    intro,
+    (num, url) => `<a href="${url}" style="color:#a78bfa;font-weight:600;text-decoration:none;">[${num}]</a>`
+  )
   const body = `
-    <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 0;">${intro}</p>
+    <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 0;">${introHtml}</p>
     ${renderTopPicks(stories)}
     <div style="height:28px;"></div>
     ${sections.map((section) => `${renderSectionHeader(section.label)}${section.stories.map(renderStory).join('')}`).join('')}

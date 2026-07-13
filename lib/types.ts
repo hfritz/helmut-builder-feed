@@ -8,6 +8,7 @@ export interface Story {
   published_at: string | null
   fetched_at: string
   batch_date: string
+  rank: number | null
 }
 
 export interface RawStory {
@@ -25,4 +26,5 @@ export interface StoryInsert {
   tags: string[]
   published_at: string | null
   batch_date: string
+  rank: number | null
 }

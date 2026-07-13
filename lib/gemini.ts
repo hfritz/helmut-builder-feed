@@ -94,7 +94,7 @@ ${articleList}`
       title: string; url: string; source: string; summary: string; tags: string[]
     }>
 
-    return parsed.slice(0, MAX_STORIES_PER_WEEK).map((s) => ({
+    return parsed.slice(0, MAX_STORIES_PER_WEEK).map((s, i) => ({
       title: s.title,
       source: s.source,
       url: s.url,
@@ -102,10 +102,11 @@ ${articleList}`
       tags: s.tags.filter((t) => VALID_TAGS.includes(t)),
       published_at: rawStories.find((r) => r.url === s.url)?.publishedAt ?? null,
       batch_date: weekStart,
+      rank: i + 1,
     }))
   } catch (err) {
     console.error('Gemini summarization failed:', err)
-    return rawStories.slice(0, MAX_STORIES_PER_WEEK).map((s) => ({
+    return rawStories.slice(0, MAX_STORIES_PER_WEEK).map((s, i) => ({
       title: s.title,
       source: s.source,
       url: s.url,
@@ -113,8 +114,21 @@ ${articleList}`
       tags: ['AI Tools'],
       published_at: s.publishedAt,
       batch_date: weekStart,
+      rank: i + 1,
     }))
   }
+}
+
+/**
+ * Resolves "[N]" citation markers (referencing the prompt's numbered story list) to
+ * "[N](url)" using the trusted story array — never the model's own URL text — so every
+ * citation in the stored summary points at a real, fetched article.
+ */
+function resolveCitations(text: string, stories: StoryInsert[]): string {
+  return text.replace(/\[(\d+)\]/g, (match, numStr) => {
+    const story = stories[parseInt(numStr, 10) - 1]
+    return story ? `[${numStr}](${story.url})` : ''
+  })
 }
 
 export async function generateDigestIntro(stories: StoryInsert[]): Promise<string> {
@@ -122,25 +136,28 @@ export async function generateDigestIntro(stories: StoryInsert[]): Promise<strin
     .map((s, i) => `${i + 1}. ${s.title} (${s.source}): ${s.summary}`)
     .join('\n')
 
-  const prompt = `You are writing the intro paragraph for "Helmut's Builder Feed", a curated Monday snapshot of AI × Product Management news, read by product managers.
+  const prompt = `You are writing the intro for "Helmut's Builder Feed", a curated Monday snapshot of AI × Product Management news, read by product managers.
 
 This Monday's stories, most important first:
 ${context}
 
-Write a 2–3 sentence intro with a smart, energetic builder tone. Requirements:
-- Open by naming story #1 above and the concrete, specific reason it matters — an actual product,
-  company, model, or number from its summary. No vague scene-setting like "the AI landscape is evolving."
-- Connect it to one or two other stories above through a real, specific thread (a shared theme, a
-  tension, a "meanwhile") — not a generic "and more."
+Write a 4–6 sentence recap covering most of the stories above — not just the top one — with a smart,
+energetic builder tone. Requirements:
+- After every specific claim, add a citation marker referencing that story's number from the list above,
+  in the exact format [N] placed immediately after the claim, e.g. "...GPT-5.6 now powers Copilot 365[1]."
+- Be concrete: name actual products, companies, models, or numbers pulled from each story's summary —
+  never vague scene-setting like "the AI landscape is evolving."
+- Where a real connecting thread exists between stories (a shared theme, a tension, a "meanwhile"),
+  group them by it rather than listing flatly.
 - Tell the reader what to do or watch for, not just what happened.
-- Do NOT list every story or write a bulleted recap — this stays one flowing paragraph, and do not
-  include any links or markdown.
+- Do not use markdown, bullet points, or actual links — plain prose with [N] markers only.
 
 Respond with just the paragraph text — no quotes, no markdown.`
 
   try {
     const result = await model.generateContent(prompt)
-    return result.response.text().trim()
+    const raw = result.response.text().trim()
+    return resolveCitations(raw, stories)
   } catch {
     return "This week's Builder Feed brings you the latest across AI tools, product strategy, and what's shaping the future of building with AI. Dive in."
   }
@@ -201,7 +218,7 @@ Each object: title, url, source, summary, tags (array).`
     return parsed
       .filter(looksLikeHistoricalStory)
       .slice(0, MAX_STORIES_PER_WEEK)
-      .map((s) => ({
+      .map((s, i) => ({
         title: s.title,
         source: s.source,
         url: s.url,
@@ -209,6 +226,7 @@ Each object: title, url, source, summary, tags (array).`
         tags: s.tags.filter((t) => VALID_TAGS.includes(t)),
         published_at: weekStart,
         batch_date: weekStart,
+        rank: i + 1,
       }))
   } catch (err) {
     console.error(`Gemini historical week failed for ${weekStart}:`, err)

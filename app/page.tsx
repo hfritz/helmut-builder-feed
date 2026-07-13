@@ -8,6 +8,7 @@ import { SubscribeForm } from '@/app/components/SubscribeForm'
 import { AboutSection } from '@/app/components/AboutSection'
 import { HomeStickyNav } from '@/app/components/HomeStickyNav'
 import { groupIntoSections, getTopPicks } from '@/lib/sections'
+import { citationsToHtml } from '@/lib/citations'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,9 +40,15 @@ export default async function Home() {
             <p className="text-xs font-semibold tracking-[0.2em] uppercase text-violet-400 mb-2">
               This Week in AI × PM
             </p>
-            <p className="text-zinc-300 text-base leading-relaxed">
-              {weekSummary}
-            </p>
+            <p
+              className="text-zinc-300 text-base leading-relaxed [&_a]:text-violet-400 [&_a]:font-semibold [&_a]:no-underline [&_a:hover]:underline"
+              dangerouslySetInnerHTML={{
+                __html: citationsToHtml(
+                  weekSummary,
+                  (num, url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">[${num}]</a>`
+                ),
+              }}
+            />
           </section>
         )}
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getThisWeeksStories, getWeeklySummary, getWeekStart } from '@/lib/supabase'
 import { generateLinkedInHashtags } from '@/lib/gemini'
 import { postToLinkedIn } from '@/lib/linkedin'
+import { citationsToPlainText } from '@/lib/citations'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
   }
 
   const hashtags = await generateLinkedInHashtags(stories)
-  await postToLinkedIn(summary, hashtags)
+  await postToLinkedIn(citationsToPlainText(summary), hashtags)
 
   return NextResponse.json({ ok: true, week: weekStart })
 }

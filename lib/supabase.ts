@@ -21,7 +21,7 @@ export async function getThisWeeksStories(): Promise<Story[]> {
     .from('stories')
     .select('*')
     .eq('batch_date', weekStart)
-    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('rank', { ascending: true, nullsFirst: false })
     .limit(15)
 
   if (error) {
