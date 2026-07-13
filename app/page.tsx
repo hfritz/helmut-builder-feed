@@ -41,7 +41,7 @@ export default async function Home() {
               This Week in AI × PM
             </p>
             <p
-              className="text-zinc-300 text-base leading-relaxed [&_a]:text-violet-400 [&_a]:font-semibold [&_a]:no-underline [&_a:hover]:underline"
+              className="text-zinc-300 text-base leading-relaxed [&_a]:text-violet-400 [&_a]:text-xs [&_a]:font-semibold [&_a]:align-super [&_a]:no-underline [&_a:hover]:underline"
               dangerouslySetInnerHTML={{
                 __html: citationsToHtml(
                   weekSummary,
@@ -51,6 +51,8 @@ export default async function Home() {
             />
           </section>
         )}
+
+        <SubscribeForm variant="compact" />
 
         {topPicks.length > 0 && (
           <section id="top-picks-this-week" className="scroll-mt-16 relative overflow-hidden border border-amber-500/40 rounded-2xl bg-gradient-to-br from-amber-500/14 via-amber-500/6 to-transparent px-6 py-6 mb-6">
@@ -84,8 +86,6 @@ export default async function Home() {
             </div>
           </section>
         )}
-
-        <SubscribeForm variant="compact" />
 
         {stories.length === 0 ? (
           <div className="text-center py-24 text-zinc-400">

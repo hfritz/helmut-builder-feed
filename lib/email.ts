@@ -174,7 +174,7 @@ export function buildEmail(stories: StoryInsert[], intro: string, weekStart: str
   const sections = groupIntoSections(stories)
   const introHtml = citationsToHtml(
     intro,
-    (num, url) => `<a href="${url}" style="color:#a78bfa;font-weight:600;text-decoration:none;">[${num}]</a>`
+    (num, url) => `<a href="${url}" style="color:#a78bfa;font-weight:600;font-size:11px;vertical-align:super;text-decoration:none;">[${num}]</a>`
   )
   const body = `
     <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 0;">${introHtml}</p>
