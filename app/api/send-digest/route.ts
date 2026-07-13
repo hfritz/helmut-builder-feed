@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getThisWeeksStories, getWeeklySummary, getWeekStart } from '@/lib/supabase'
-import { getActiveSubscribers } from '@/lib/subscribers'
-import { sendWeeklyDigest } from '@/lib/email'
+import { getActiveSubscribers, recordFailedSends } from '@/lib/subscribers'
+import { sendWeeklyDigest, sendFailureReport } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -29,6 +29,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, sent: 0, message: 'No active subscribers' })
   }
 
-  await sendWeeklyDigest(stories, summary, weekStart, subscribers)
-  return NextResponse.json({ ok: true, sent: subscribers.length, week: weekStart })
+  const failed = await sendWeeklyDigest(stories, summary, weekStart, subscribers)
+  if (failed.length > 0) {
+    await recordFailedSends(weekStart, failed)
+    await sendFailureReport(weekStart, failed)
+  }
+  return NextResponse.json({ ok: true, sent: subscribers.length - failed.length, failed: failed.length, week: weekStart })
 }

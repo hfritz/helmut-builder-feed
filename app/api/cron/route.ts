@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { deleteWeeksStories, saveStories, saveWeeklySummary, getWeekStart } from '@/lib/supabase'
 import { fetchAllFeeds } from '@/lib/rss'
 import { summarizeAndTagStories, generateDigestIntro, generateLinkedInHashtags } from '@/lib/gemini'
-import { getActiveSubscribers } from '@/lib/subscribers'
-import { sendWeeklyDigest } from '@/lib/email'
+import { getActiveSubscribers, recordFailedSends } from '@/lib/subscribers'
+import { sendWeeklyDigest, sendFailureReport } from '@/lib/email'
 import { postToLinkedIn } from '@/lib/linkedin'
 
 export const dynamic = 'force-dynamic'
@@ -30,9 +30,15 @@ export async function GET(req: NextRequest) {
 
     const subscribers = await getActiveSubscribers()
     console.log(`[Cron] Active subscribers: ${subscribers.length}`)
+    let failedCount = 0
     if (subscribers.length > 0) {
-      await sendWeeklyDigest(summarized, summary, weekStart, subscribers)
-      console.log(`[Cron] Digest sent to ${subscribers.length} subscribers`)
+      const failed = await sendWeeklyDigest(summarized, summary, weekStart, subscribers)
+      failedCount = failed.length
+      console.log(`[Cron] Digest sent to ${subscribers.length - failed.length}/${subscribers.length} subscribers`)
+      if (failed.length > 0) {
+        await recordFailedSends(weekStart, failed)
+        await sendFailureReport(weekStart, failed)
+      }
     } else {
       console.log('[Cron] No active subscribers — skipping email send')
     }
@@ -45,7 +51,7 @@ export async function GET(req: NextRequest) {
       console.error('[Cron] LinkedIn post failed:', err)
     }
 
-    return NextResponse.json({ ok: true, count: summarized.length, week: weekStart, subscribers: subscribers.length })
+    return NextResponse.json({ ok: true, count: summarized.length, week: weekStart, subscribers: subscribers.length, failed: failedCount })
   } catch (err) {
     console.error('[Cron] Failed:', err)
     return NextResponse.json({ error: 'Cron job failed' }, { status: 500 })

@@ -1,9 +1,10 @@
 import { Resend } from 'resend'
 import type { StoryInsert } from './types'
+import { groupIntoSections } from './sections'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = "Helmut's Builder Feed <builders-feed@helmutfritz.fyi>"
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://helmutfritz.fyi'
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://helmutfritz.fyi').replace(/\/+$/, '')
 
 const TAG_COLORS: Record<string, string> = {
   'AI Tools': '#7c3aed',
@@ -83,6 +84,16 @@ function renderStory(story: StoryInsert): string {
     </div>`
 }
 
+function renderSectionHeader(label: string): string {
+  return `
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:28px 0 14px;">
+      <tr>
+        <td style="color:#6F00FF;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;white-space:nowrap;padding-right:12px;">${label}</td>
+        <td style="border-top:1px solid rgba(255,255,255,0.08);font-size:0;line-height:0;">&nbsp;</td>
+      </tr>
+    </table>`
+}
+
 function footer(unsubscribeUrl: string): string {
   return `
   <div style="margin-top:40px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);">
@@ -91,6 +102,8 @@ function footer(unsubscribeUrl: string): string {
     </p>
     <p style="color:#52525b;font-size:12px;margin:0;">
       <a href="${SITE_URL}" style="color:#6F00FF;text-decoration:none;">Visit the feed</a>
+      &nbsp;·&nbsp;
+      <a href="${SITE_URL}/privacy" style="color:#52525b;text-decoration:none;">Privacy</a>
       &nbsp;·&nbsp;
       <a href="${unsubscribeUrl}" style="color:#52525b;text-decoration:none;">Unsubscribe</a>
     </p>
@@ -120,12 +133,13 @@ function shell(title: string, heroHtml: string, bodyHtml: string): string {
 </html>`
 }
 
-function buildEmail(stories: StoryInsert[], intro: string, weekStart: string, unsubscribeUrl: string): string {
+export function buildEmail(stories: StoryInsert[], intro: string, weekStart: string, unsubscribeUrl: string): string {
   const weekLabel = formatWeekLabel(weekStart)
   const hero = heroSection('Weekly Digest', `Week of ${weekLabel}`)
+  const sections = groupIntoSections(stories)
   const body = `
     <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 28px;">${intro}</p>
-    ${stories.map(renderStory).join('')}
+    ${sections.map((section) => `${renderSectionHeader(section.label)}${section.stories.map(renderStory).join('')}`).join('')}
     ${footer(unsubscribeUrl)}`
   return shell(`Helmut's Builder Feed — Week of ${weekLabel}`, hero, body)
 }
@@ -156,33 +170,105 @@ export async function sendWelcomeEmail(email: string, token: string): Promise<vo
   if (error) console.error('[Email] Welcome email failed:', error)
 }
 
+export interface FailedSend {
+  email: string
+  error: string
+}
+
+async function sendOne(
+  { email, token }: { email: string; token: string },
+  stories: StoryInsert[],
+  intro: string,
+  weekStart: string
+): Promise<FailedSend | null> {
+  const unsubscribeUrl = `${SITE_URL}/api/unsubscribe?token=${token}`
+  const html = buildEmail(stories, intro, weekStart, unsubscribeUrl)
+  const weekLabel = formatWeekLabel(weekStart)
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM,
+      to: email,
+      subject: `Builder Feed — Week of ${weekLabel}`,
+      html,
+    })
+    if (error) return { email, error: error.message ?? JSON.stringify(error) }
+    return null
+  } catch (err) {
+    return { email, error: err instanceof Error ? err.message : String(err) }
+  }
+}
+
+// Resend caps at 10 requests/second — stay comfortably under that with room for the LinkedIn/cron calls sharing the same window.
+const RATE_LIMIT_BATCH_SIZE = 8
+const RATE_LIMIT_DELAY_MS = 1100
+
+async function sendBatched(
+  subscribers: Array<{ email: string; token: string }>,
+  stories: StoryInsert[],
+  intro: string,
+  weekStart: string
+): Promise<FailedSend[]> {
+  const failed: FailedSend[] = []
+  for (let i = 0; i < subscribers.length; i += RATE_LIMIT_BATCH_SIZE) {
+    const chunk = subscribers.slice(i, i + RATE_LIMIT_BATCH_SIZE)
+    const results = await Promise.all(chunk.map((s) => sendOne(s, stories, intro, weekStart)))
+    failed.push(...results.filter((f): f is FailedSend => f !== null))
+    if (i + RATE_LIMIT_BATCH_SIZE < subscribers.length) {
+      await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS))
+    }
+  }
+  return failed
+}
+
+/** Sends the digest to all subscribers in rate-limit-safe batches, retrying failures once, and returns any that still failed. */
 export async function sendWeeklyDigest(
   stories: StoryInsert[],
   intro: string,
   weekStart: string,
   subscribers: Array<{ email: string; token: string }>
-): Promise<void> {
-  if (subscribers.length === 0) return
+): Promise<FailedSend[]> {
+  if (subscribers.length === 0) return []
 
-  const results = await Promise.allSettled(
-    subscribers.map(({ email, token }) => {
-      const unsubscribeUrl = `${SITE_URL}/api/unsubscribe?token=${token}`
-      const html = buildEmail(stories, intro, weekStart, unsubscribeUrl)
-      const weekLabel = formatWeekLabel(weekStart)
-      return resend.emails.send({
-        from: FROM,
-        to: email,
-        subject: `Builder Feed — Week of ${weekLabel}`,
-        html,
-      })
-    })
-  )
+  let failed = await sendBatched(subscribers, stories, intro, weekStart)
 
-  const failed = results.filter((r) => r.status === 'rejected').length
-  console.log(`[Email] Sent to ${subscribers.length - failed}/${subscribers.length} subscribers`)
-  if (failed > 0) {
-    results.forEach((r, i) => {
-      if (r.status === 'rejected') console.error(`[Email] Failed for subscriber ${i}:`, r.reason)
-    })
+  if (failed.length > 0) {
+    console.warn(`[Email] ${failed.length}/${subscribers.length} failed on first attempt, retrying once:`, failed.map((f) => f.email))
+    const retrySubscribers = subscribers.filter((s) => failed.some((f) => f.email === s.email))
+    failed = await sendBatched(retrySubscribers, stories, intro, weekStart)
   }
+
+  console.log(`[Email] Sent to ${subscribers.length - failed.length}/${subscribers.length} subscribers`)
+  if (failed.length > 0) {
+    console.error('[Email] Permanently failed for:', failed)
+  }
+  return failed
+}
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'helmut.fritz.v@gmail.com'
+
+export async function sendFailureReport(weekStart: string, failed: FailedSend[]): Promise<void> {
+  if (failed.length === 0) return
+
+  const rows = failed
+    .map((f) => `<tr><td style="padding:6px 12px;color:#e4e4e7;">${f.email}</td><td style="padding:6px 12px;color:#a1a1aa;">${f.error}</td></tr>`)
+    .join('')
+
+  const html = `<!DOCTYPE html>
+<html><body style="background:#09090b;color:#e4e4e7;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;">
+  <h2 style="color:#ffffff;">Builder Feed — ${failed.length} digest send${failed.length === 1 ? '' : 's'} failed</h2>
+  <p style="color:#a1a1aa;">Week of ${weekStart}. These subscribers did not receive the digest after one retry:</p>
+  <table style="border-collapse:collapse;">${rows}</table>
+  <p style="color:#71717a;font-size:13px;margin-top:20px;">
+    Trigger a retry: POST ${SITE_URL}/api/retry-failed?week=${weekStart}
+  </p>
+</body></html>`
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: ADMIN_EMAIL,
+    subject: `[Builder Feed] ${failed.length} digest send${failed.length === 1 ? '' : 's'} failed — week of ${weekStart}`,
+    html,
+  })
+  if (error) console.error('[Email] Failure report itself failed to send:', error)
 }

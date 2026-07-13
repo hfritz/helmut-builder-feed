@@ -7,38 +7,9 @@ import { StoryCard } from '@/app/components/StoryCard'
 import { SubscribeForm } from '@/app/components/SubscribeForm'
 import { AboutSection } from '@/app/components/AboutSection'
 import { HomeStickyNav } from '@/app/components/HomeStickyNav'
-import { Story } from '@/lib/types'
+import { groupIntoSections } from '@/lib/sections'
 
 export const dynamic = 'force-dynamic'
-
-const SECTION_MAP: Array<{ label: string; tags: string[] }> = [
-  { label: 'Build with this', tags: ['AI Tools', 'Agents', 'Dev Tools', 'Vibe Coding', 'Launch'] },
-  { label: 'Think with this', tags: ['Strategy', 'Product Management', 'Research', 'Workflows'] },
-  { label: 'Understand this', tags: ['LLMs', 'AI Design'] },
-  { label: 'Watch this', tags: ['Funding'] },
-]
-
-function groupIntoSections(stories: Story[]) {
-  const usedIds = new Set<string>()
-  const sections: Array<{ label: string; stories: Story[] }> = []
-
-  for (const section of SECTION_MAP) {
-    const matching = stories.filter(
-      (s) => !usedIds.has(s.id) && s.tags.some((t) => section.tags.includes(t))
-    )
-    matching.forEach((s) => usedIds.add(s.id))
-    if (matching.length > 0) {
-      sections.push({ label: section.label, stories: matching })
-    }
-  }
-
-  const remaining = stories.filter((s) => !usedIds.has(s.id))
-  if (remaining.length > 0) {
-    sections.push({ label: 'More This Week', stories: remaining })
-  }
-
-  return sections
-}
 
 export default async function Home() {
   let stories = await getThisWeeksStories()

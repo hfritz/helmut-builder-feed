@@ -11,6 +11,10 @@ export function Footer() {
         Helmut Fritz
       </a>
       {' '}using AI tools · 2026
+      {' '}·{' '}
+      <a href="/privacy" className="hover:text-zinc-300 transition-colors">
+        Privacy
+      </a>
     </footer>
   )
 }

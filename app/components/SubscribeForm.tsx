@@ -68,6 +68,14 @@ export function SubscribeForm({ variant = 'default' }: SubscribeFormProps) {
             )}
           </form>
         )}
+        {status !== 'success' && (
+          <p className="text-[11px] text-zinc-500 text-center mt-3 relative z-10">
+            By subscribing, you agree to the{' '}
+            <a href="/privacy" className="underline hover:text-zinc-300 transition-colors">
+              Privacy Policy
+            </a>.
+          </p>
+        )}
       </div>
     )
   }
@@ -109,6 +117,14 @@ export function SubscribeForm({ variant = 'default' }: SubscribeFormProps) {
 
       {status === 'error' && (
         <p className="text-xs text-red-400 mt-2">Something went wrong. Please try again.</p>
+      )}
+      {status !== 'success' && (
+        <p className="text-[11px] text-zinc-500 mt-4">
+          By subscribing, you agree to the{' '}
+          <a href="/privacy" className="underline hover:text-zinc-300 transition-colors">
+            Privacy Policy
+          </a>.
+        </p>
       )}
     </section>
   )
