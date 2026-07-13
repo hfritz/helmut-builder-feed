@@ -119,14 +119,15 @@ function renderTopPicks(stories: StoryInsert[]): string {
     </table>`
 }
 
-function renderSectionHeader(label: string): string {
+function renderSectionHeader(label: string, description: string): string {
   return `
-    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:28px 0 14px;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:28px 0 2px;">
       <tr>
         <td style="color:#6F00FF;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;white-space:nowrap;padding-right:12px;">${label}</td>
         <td style="border-top:1px solid rgba(255,255,255,0.08);font-size:0;line-height:0;">&nbsp;</td>
       </tr>
-    </table>`
+    </table>
+    <p style="color:#71717a;font-size:13px;margin:0 0 14px;">${description}</p>`
 }
 
 function footer(unsubscribeUrl: string): string {
@@ -180,7 +181,7 @@ export function buildEmail(stories: StoryInsert[], intro: string, weekStart: str
     <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 0;">${introHtml}</p>
     ${renderTopPicks(stories)}
     <div style="height:28px;"></div>
-    ${sections.map((section) => `${renderSectionHeader(section.label)}${section.stories.map(renderStory).join('')}`).join('')}
+    ${sections.map((section) => `${renderSectionHeader(section.label, section.description)}${section.stories.map(renderStory).join('')}`).join('')}
     ${footer(unsubscribeUrl)}`
   return shell(`Helmut's Builder Feed — Week of ${weekLabel}`, hero, body)
 }
