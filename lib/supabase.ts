@@ -15,8 +15,7 @@ export function getWeekStart(date: Date = new Date()): string {
   return d.toISOString().split('T')[0]
 }
 
-export async function getThisWeeksStories(): Promise<Story[]> {
-  const weekStart = getWeekStart()
+export async function getThisWeeksStories(weekStart: string = getWeekStart()): Promise<Story[]> {
   const { data, error } = await supabase
     .from('stories')
     .select('*')
@@ -74,10 +73,10 @@ export async function deleteWeeksStories(weekStart: string): Promise<void> {
   }
 }
 
-export async function saveWeeklySummary(weekStart: string, summary: string): Promise<void> {
+export async function saveWeeklySummary(weekStart: string, summary: string, teaser: string): Promise<void> {
   const { error } = await supabase
     .from('weekly_summaries')
-    .upsert({ week_start: weekStart, summary }, { onConflict: 'week_start' })
+    .upsert({ week_start: weekStart, summary, teaser }, { onConflict: 'week_start' })
 
   if (error) {
     console.error('Supabase weekly summary write error:', error.message)
@@ -93,6 +92,17 @@ export async function getWeeklySummary(weekStart: string): Promise<string | null
 
   if (error) return null
   return data?.summary ?? null
+}
+
+export async function getWeeklySummaryTeaser(weekStart: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('weekly_summaries')
+    .select('teaser')
+    .eq('week_start', weekStart)
+    .single()
+
+  if (error) return null
+  return data?.teaser ?? null
 }
 
 export async function searchArchive(query: string): Promise<Story[]> {

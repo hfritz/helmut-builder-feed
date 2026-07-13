@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getThisWeeksStories, getWeeklySummary, getWeekStart } from '@/lib/supabase'
+import { getThisWeeksStories, getWeeklySummary, getWeeklySummaryTeaser, getWeekStart } from '@/lib/supabase'
 import { getActiveSubscribers, recordFailedSends } from '@/lib/subscribers'
 import { sendWeeklyDigest, sendFailureReport } from '@/lib/email'
 
@@ -13,9 +13,10 @@ export async function POST(req: NextRequest) {
   }
 
   const weekStart = getWeekStart()
-  const [stories, summary, subscribers] = await Promise.all([
+  const [stories, summary, teaser, subscribers] = await Promise.all([
     getThisWeeksStories(),
     getWeeklySummary(weekStart),
+    getWeeklySummaryTeaser(weekStart),
     getActiveSubscribers(),
   ])
 
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, sent: 0, message: 'No active subscribers' })
   }
 
-  const failed = await sendWeeklyDigest(stories, summary, weekStart, subscribers)
+  const failed = await sendWeeklyDigest(stories, summary, weekStart, subscribers, teaser)
   if (failed.length > 0) {
     await recordFailedSends(weekStart, failed)
     await sendFailureReport(weekStart, failed)

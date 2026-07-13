@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getThisWeeksStories, saveWeeklySummary, getWeekStart } from '@/lib/supabase'
-import { generateDigestIntro } from '@/lib/gemini'
+import { generateDigestIntro, generateSubjectTeaser } from '@/lib/gemini'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +18,8 @@ export async function GET(req: NextRequest) {
   }
 
   const summary = await generateDigestIntro(stories)
-  await saveWeeklySummary(weekStart, summary)
+  const teaser = await generateSubjectTeaser(stories, summary)
+  await saveWeeklySummary(weekStart, summary, teaser)
 
-  return NextResponse.json({ ok: true, week: weekStart, summary })
+  return NextResponse.json({ ok: true, week: weekStart, summary, teaser })
 }

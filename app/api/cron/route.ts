@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { deleteWeeksStories, saveStories, saveWeeklySummary, getWeekStart, getRecentlyUsedUrls, DEDUP_WINDOW_DAYS } from '@/lib/supabase'
 import { fetchAllFeeds } from '@/lib/rss'
-import { summarizeAndTagStories, generateDigestIntro, generateLinkedInHashtags } from '@/lib/gemini'
+import { summarizeAndTagStories, generateDigestIntro, generateSubjectTeaser, generateLinkedInHashtags } from '@/lib/gemini'
 import { getActiveSubscribers, recordFailedSends } from '@/lib/subscribers'
 import { sendWeeklyDigest, sendFailureReport } from '@/lib/email'
 import { postToLinkedIn } from '@/lib/linkedin'
@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
     await saveStories(summarized)
 
     const summary = await generateDigestIntro(summarized)
-    await saveWeeklySummary(weekStart, summary)
+    const teaser = await generateSubjectTeaser(summarized, summary)
+    await saveWeeklySummary(weekStart, summary, teaser)
 
     console.log(`[Cron] Weekly refresh: ${summarized.length} stories for week of ${weekStart}`)
 
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
     console.log(`[Cron] Active subscribers: ${subscribers.length}`)
     let failedCount = 0
     if (subscribers.length > 0) {
-      const failed = await sendWeeklyDigest(summarized, summary, weekStart, subscribers)
+      const failed = await sendWeeklyDigest(summarized, summary, weekStart, subscribers, teaser)
       failedCount = failed.length
       console.log(`[Cron] Digest sent to ${subscribers.length - failed.length}/${subscribers.length} subscribers`)
       if (failed.length > 0) {

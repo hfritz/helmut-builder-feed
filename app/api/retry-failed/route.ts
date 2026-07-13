@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getThisWeeksStories, getWeeklySummary, getWeekStart } from '@/lib/supabase'
+import { getThisWeeksStories, getWeeklySummary, getWeeklySummaryTeaser, getWeekStart } from '@/lib/supabase'
 import { getPendingFailedSends, recordFailedSends, resolveFailedSends } from '@/lib/subscribers'
 import { sendWeeklyDigest, sendFailureReport } from '@/lib/email'
 
@@ -19,12 +19,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, retried: 0, message: 'No pending failed sends for this week' })
   }
 
-  const [stories, summary] = await Promise.all([getThisWeeksStories(), getWeeklySummary(weekStart)])
+  const [stories, summary, teaser] = await Promise.all([
+    getThisWeeksStories(weekStart),
+    getWeeklySummary(weekStart),
+    getWeeklySummaryTeaser(weekStart),
+  ])
   if (stories.length === 0 || !summary) {
     return NextResponse.json({ error: 'No stories or summary found for this week' }, { status: 404 })
   }
 
-  const failed = await sendWeeklyDigest(stories, summary, weekStart, pending)
+  const failed = await sendWeeklyDigest(stories, summary, weekStart, pending, teaser)
   const failedEmails = new Set(failed.map((f) => f.email))
   const succeededIds = pending.filter((p) => !failedEmails.has(p.email)).map((p) => p.id)
 

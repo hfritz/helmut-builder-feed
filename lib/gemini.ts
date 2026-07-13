@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import type { RawStory, StoryInsert } from './types'
 import { getWeekStart } from './supabase'
+import { citationsToPlainText } from './citations'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
@@ -161,6 +162,34 @@ Respond with just the paragraph text — no quotes, no markdown.`
   } catch {
     return "This week's Builder Feed brings you the latest across AI tools, product strategy, and what's shaping the future of building with AI. Dive in."
   }
+}
+
+/** Short (6-10 word) email subject-line teaser summarizing the week's overall theme, not just the top story. */
+export async function generateSubjectTeaser(stories: StoryInsert[], intro: string): Promise<string> {
+  const prompt = `Here is this week's "Helmut's Builder Feed" recap (an AI × Product Management digest):
+
+${citationsToPlainText(intro)}
+
+Write a single email subject-line teaser, 6-10 words. Requirements:
+- Find one real connecting thread that runs across at least two different stories in the recap above
+  (a shared theme, a tension, a "meanwhile") — the same kind of thread the recap itself draws out.
+  Do not just restate the opening story or lead with only the first thing mentioned.
+- Be concrete: name an actual product, company, or number from the recap, but in service of that
+  thread, not as a standalone headline.
+- No quotes, no markdown, no trailing punctuation, no generic phrases like "this week in AI."
+
+Respond with just the teaser text.`
+
+  try {
+    const result = await model.generateContent(prompt)
+    const teaser = result.response.text().trim().replace(/^["']|["']$/g, '')
+    if (teaser) return teaser
+  } catch {
+    // fall through to title-based fallback
+  }
+
+  const fallback = stories[0]?.title ?? "This week's Builder Feed"
+  return fallback.length > 70 ? `${fallback.slice(0, 67)}...` : fallback
 }
 
 export async function generateLinkedInHashtags(stories: StoryInsert[]): Promise<string> {

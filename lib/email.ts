@@ -221,17 +221,19 @@ async function sendOne(
   { email, token }: { email: string; token: string },
   stories: StoryInsert[],
   intro: string,
-  weekStart: string
+  weekStart: string,
+  teaser: string | null
 ): Promise<FailedSend | null> {
   const unsubscribeUrl = `${SITE_URL}/api/unsubscribe?token=${token}`
   const html = buildEmail(stories, intro, weekStart, unsubscribeUrl)
   const weekLabel = formatWeekLabel(weekStart)
+  const subject = teaser ? `${teaser} — Builder Feed` : `Builder Feed — Week of ${weekLabel}`
 
   try {
     const { error } = await resend.emails.send({
       from: FROM,
       to: email,
-      subject: `Builder Feed — Week of ${weekLabel}`,
+      subject,
       html,
     })
     if (error) return { email, error: error.message ?? JSON.stringify(error) }
@@ -249,12 +251,13 @@ async function sendBatched(
   subscribers: Array<{ email: string; token: string }>,
   stories: StoryInsert[],
   intro: string,
-  weekStart: string
+  weekStart: string,
+  teaser: string | null
 ): Promise<FailedSend[]> {
   const failed: FailedSend[] = []
   for (let i = 0; i < subscribers.length; i += RATE_LIMIT_BATCH_SIZE) {
     const chunk = subscribers.slice(i, i + RATE_LIMIT_BATCH_SIZE)
-    const results = await Promise.all(chunk.map((s) => sendOne(s, stories, intro, weekStart)))
+    const results = await Promise.all(chunk.map((s) => sendOne(s, stories, intro, weekStart, teaser)))
     failed.push(...results.filter((f): f is FailedSend => f !== null))
     if (i + RATE_LIMIT_BATCH_SIZE < subscribers.length) {
       await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS))
@@ -268,16 +271,17 @@ export async function sendWeeklyDigest(
   stories: StoryInsert[],
   intro: string,
   weekStart: string,
-  subscribers: Array<{ email: string; token: string }>
+  subscribers: Array<{ email: string; token: string }>,
+  teaser: string | null = null
 ): Promise<FailedSend[]> {
   if (subscribers.length === 0) return []
 
-  let failed = await sendBatched(subscribers, stories, intro, weekStart)
+  let failed = await sendBatched(subscribers, stories, intro, weekStart, teaser)
 
   if (failed.length > 0) {
     console.warn(`[Email] ${failed.length}/${subscribers.length} failed on first attempt, retrying once:`, failed.map((f) => f.email))
     const retrySubscribers = subscribers.filter((s) => failed.some((f) => f.email === s.email))
-    failed = await sendBatched(retrySubscribers, stories, intro, weekStart)
+    failed = await sendBatched(retrySubscribers, stories, intro, weekStart, teaser)
   }
 
   console.log(`[Email] Sent to ${subscribers.length - failed.length}/${subscribers.length} subscribers`)
