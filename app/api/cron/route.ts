@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { deleteWeeksStories, saveStories, saveWeeklySummary, getWeekStart } from '@/lib/supabase'
+import { deleteWeeksStories, saveStories, saveWeeklySummary, getWeekStart, getRecentlyUsedUrls, DEDUP_WINDOW_DAYS } from '@/lib/supabase'
 import { fetchAllFeeds } from '@/lib/rss'
 import { summarizeAndTagStories, generateDigestIntro, generateLinkedInHashtags } from '@/lib/gemini'
 import { getActiveSubscribers, recordFailedSends } from '@/lib/subscribers'
@@ -20,7 +20,10 @@ export async function GET(req: NextRequest) {
   try {
     await deleteWeeksStories(weekStart)
     const raw = await fetchAllFeeds()
-    const summarized = await summarizeAndTagStories(raw)
+    const recentUrls = await getRecentlyUsedUrls(DEDUP_WINDOW_DAYS)
+    const fresh = raw.filter((s) => !recentUrls.has(s.url))
+    console.log(`[Cron] ${raw.length - fresh.length} article(s) already covered in the last ${DEDUP_WINDOW_DAYS} days, excluded`)
+    const summarized = await summarizeAndTagStories(fresh)
     await saveStories(summarized)
 
     const summary = await generateDigestIntro(summarized)

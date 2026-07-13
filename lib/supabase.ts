@@ -31,6 +31,28 @@ export async function getThisWeeksStories(): Promise<Story[]> {
   return (data as Story[]) ?? []
 }
 
+// Slow-publishing sources can keep the same item in their "latest" feed for weeks —
+// exclude anything already published in a recent batch to avoid repeating stories.
+export const DEDUP_WINDOW_DAYS = 21
+
+/** URLs already published in any batch within the last `days` days, so a week's fetch can exclude repeats. */
+export async function getRecentlyUsedUrls(days: number): Promise<Set<string>> {
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - days)
+  const cutoffStr = cutoff.toISOString().split('T')[0]
+
+  const { data, error } = await supabase
+    .from('stories')
+    .select('url')
+    .gte('batch_date', cutoffStr)
+
+  if (error) {
+    console.error('Get recently used URLs error:', error.message)
+    return new Set()
+  }
+  return new Set((data ?? []).map((d) => d.url as string))
+}
+
 export async function saveStories(stories: StoryInsert[]): Promise<void> {
   const { error } = await supabase
     .from('stories')

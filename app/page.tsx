@@ -1,4 +1,4 @@
-import { getThisWeeksStories, saveStories, getWeeklySummary, getWeekStart } from '@/lib/supabase'
+import { getThisWeeksStories, saveStories, getWeeklySummary, getWeekStart, getRecentlyUsedUrls, DEDUP_WINDOW_DAYS } from '@/lib/supabase'
 import { fetchAllFeeds } from '@/lib/rss'
 import { summarizeAndTagStories } from '@/lib/gemini'
 import { Header } from '@/app/components/Header'
@@ -16,7 +16,9 @@ export default async function Home() {
 
   if (stories.length === 0) {
     const raw = await fetchAllFeeds()
-    const summarized = await summarizeAndTagStories(raw)
+    const recentUrls = await getRecentlyUsedUrls(DEDUP_WINDOW_DAYS)
+    const fresh = raw.filter((s) => !recentUrls.has(s.url))
+    const summarized = await summarizeAndTagStories(fresh)
     await saveStories(summarized)
     stories = await getThisWeeksStories()
   }

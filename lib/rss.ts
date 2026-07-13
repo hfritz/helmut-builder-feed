@@ -41,6 +41,19 @@ const parser = new XMLParser({
   isArray: (name) => ['item', 'entry'].includes(name),
 })
 
+// Digest covers "last week" — a small buffer past 7 days absorbs cron/timezone drift
+// and slower-publishing sources without letting genuinely stale articles back in.
+const MAX_ARTICLE_AGE_MS = 8 * 24 * 60 * 60 * 1000
+const FUTURE_TOLERANCE_MS = 60 * 60 * 1000 // clock skew allowance
+
+function isRecent(publishedAt: string | null): boolean {
+  if (!publishedAt) return false
+  const publishedMs = new Date(publishedAt).getTime()
+  if (Number.isNaN(publishedMs)) return false
+  const age = Date.now() - publishedMs
+  return age >= -FUTURE_TOLERANCE_MS && age <= MAX_ARTICLE_AGE_MS
+}
+
 function extractItems(parsed: Record<string, unknown>, sourceName: string): RawStory[] {
   const stories: RawStory[] = []
 
@@ -97,11 +110,15 @@ export async function fetchAllFeeds(): Promise<RawStory[]> {
         const xml = await res.text()
         const parsed = parser.parse(xml) as Record<string, unknown>
         const items = extractItems(parsed, name)
-        for (const item of items.slice(0, 7)) {
+        const recent = items.filter((item) => isRecent(item.publishedAt))
+        for (const item of recent.slice(0, 7)) {
           if (!seen.has(item.url)) {
             seen.add(item.url)
             all.push(item)
           }
+        }
+        if (recent.length < items.length) {
+          console.log(`[RSS] ${name}: dropped ${items.length - recent.length} stale/undated of ${items.length} items`)
         }
       } catch (err) {
         console.warn(`RSS fetch failed for ${name}:`, err)
@@ -109,6 +126,7 @@ export async function fetchAllFeeds(): Promise<RawStory[]> {
     })
   )
 
-  // Give Gemini a large pool — it decides what's relevant
+  console.log(`[RSS] ${all.length} recent articles across ${RSS_SOURCES.length} sources`)
+  // Give Gemini a large pool of *recent* articles — it decides what's relevant within that
   return all
 }
