@@ -76,6 +76,9 @@ Below is a list of recent articles from tech publications. Your task:
    descending importance. "Most important" means most consequential for a PM's actual decisions this
    week — a major model release or a widely-relevant strategy shift outranks a minor tool update.
 
+Writing style: never use em dashes (—) or en dashes (–) anywhere in the summaries. Use a comma,
+a period, a colon, or "and"/"but" instead.
+
 Respond ONLY with a valid JSON array. No markdown, no explanation, no code fences.
 Each object must have exactly these fields:
 - title (string, the original article title)
@@ -111,7 +114,7 @@ ${articleList}`
       title: s.title,
       source: s.source,
       url: s.url,
-      summary: 'Summary unavailable — click to read the full article.',
+      summary: 'Summary unavailable, click to read the full article.',
       tags: ['AI Tools'],
       published_at: s.publishedAt,
       batch_date: weekStart,
@@ -152,6 +155,7 @@ energetic builder tone. Requirements:
   group them by it rather than listing flatly.
 - Tell the reader what to do or watch for, not just what happened.
 - Do not use markdown, bullet points, or actual links — plain prose with [N] markers only.
+- Never use em dashes (—) or en dashes (–). Use a comma, a period, a colon, or "and"/"but" instead.
 
 Respond with just the paragraph text — no quotes, no markdown.`
 
@@ -177,6 +181,7 @@ Write a single email subject-line teaser, 6-10 words. Requirements:
 - Be concrete: name an actual product, company, or number from the recap, but in service of that
   thread, not as a standalone headline.
 - No quotes, no markdown, no trailing punctuation, no generic phrases like "this week in AI."
+- Never use an em dash (—) or en dash (–).
 
 Respond with just the teaser text.`
 
@@ -232,6 +237,9 @@ For each story, provide:
 - A real or plausible URL for the article
 - A 2–3 sentence summary of why it matters for product managers
 - 2–4 tags from: ${VALID_TAGS.join(', ')}
+
+Writing style: never use em dashes (—) or en dashes (–) anywhere in the summaries. Use a comma,
+a period, a colon, or "and"/"but" instead.
 
 Respond ONLY with a valid JSON array. No markdown, no code fences.
 Each object: title, url, source, summary, tags (array).`
