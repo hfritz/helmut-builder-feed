@@ -105,6 +105,27 @@ export async function getWeeklySummaryTeaser(weekStart: string): Promise<string 
   return data?.teaser ?? null
 }
 
+export async function getLinkedInTokenIssuedAt(): Promise<Date | null> {
+  const { data, error } = await supabase
+    .from('linkedin_token')
+    .select('issued_at')
+    .eq('id', true)
+    .single()
+
+  if (error) return null
+  return data?.issued_at ? new Date(data.issued_at) : null
+}
+
+export async function setLinkedInTokenIssuedAt(date: Date): Promise<void> {
+  const { error } = await supabase
+    .from('linkedin_token')
+    .upsert({ id: true, issued_at: date.toISOString() }, { onConflict: 'id' })
+
+  if (error) {
+    console.error('Supabase LinkedIn token write error:', error.message)
+  }
+}
+
 export async function searchArchive(query: string): Promise<Story[]> {
   const weekStart = getWeekStart()
   const q = query.trim()

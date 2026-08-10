@@ -318,3 +318,48 @@ export async function sendFailureReport(weekStart: string, failed: FailedSend[])
   })
   if (error) console.error('[Email] Failure report itself failed to send:', error)
 }
+
+export async function sendLinkedInFailureReport(weekStart: string, errorMessage: string): Promise<void> {
+  const html = `<!DOCTYPE html>
+<html><body style="background:#09090b;color:#e4e4e7;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;">
+  <h2 style="color:#ffffff;">Builder Feed — LinkedIn post failed</h2>
+  <p style="color:#a1a1aa;">Week of ${weekStart}. The weekly digest emails still went out, but the LinkedIn post did not publish:</p>
+  <pre style="background:#18181b;color:#f87171;padding:12px 16px;border-radius:8px;white-space:pre-wrap;font-size:13px;">${errorMessage}</pre>
+  <p style="color:#a1a1aa;font-size:13px;margin-top:20px;">
+    Likely cause: the LinkedIn access token expired (it lasts ~60 days and this app isn't issued a refresh token).
+    Re-run the re-auth flow — visit <code>${SITE_URL}/api/linkedin/auth?secret=CRON_SECRET</code> while logged into LinkedIn,
+    then copy the returned <code>LINKEDIN_ACCESS_TOKEN</code> / <code>LINKEDIN_PERSON_URN</code> into Vercel's production env vars and redeploy.
+  </p>
+  <p style="color:#71717a;font-size:13px;">
+    Once fixed, republish this week's post: POST ${SITE_URL}/api/linkedin/post
+  </p>
+</body></html>`
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: ADMIN_EMAIL,
+    subject: `[Builder Feed] LinkedIn post failed — week of ${weekStart}`,
+    html,
+  })
+  if (error) console.error('[Email] LinkedIn failure report itself failed to send:', error)
+}
+
+export async function sendLinkedInExpiryWarning(daysRemaining: number): Promise<void> {
+  const html = `<!DOCTYPE html>
+<html><body style="background:#09090b;color:#e4e4e7;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;">
+  <h2 style="color:#ffffff;">Builder Feed — LinkedIn token expiring soon</h2>
+  <p style="color:#a1a1aa;">The current LinkedIn access token expires in ~${daysRemaining} day${daysRemaining === 1 ? '' : 's'}. LinkedIn doesn't issue this app a refresh token, so it won't renew itself.</p>
+  <p style="color:#a1a1aa;font-size:13px;margin-top:20px;">
+    Re-auth now to avoid a missed Monday post — visit <code>${SITE_URL}/api/linkedin/auth?secret=CRON_SECRET</code> while logged into LinkedIn,
+    then copy the returned <code>LINKEDIN_ACCESS_TOKEN</code> / <code>LINKEDIN_PERSON_URN</code> into Vercel's production env vars and redeploy.
+  </p>
+</body></html>`
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: ADMIN_EMAIL,
+    subject: `[Builder Feed] LinkedIn token expires in ~${daysRemaining} days`,
+    html,
+  })
+  if (error) console.error('[Email] LinkedIn expiry warning itself failed to send:', error)
+}

@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { deleteWeeksStories, saveStories, saveWeeklySummary, getWeekStart, getRecentlyUsedUrls, DEDUP_WINDOW_DAYS } from '@/lib/supabase'
+import { deleteWeeksStories, saveStories, saveWeeklySummary, getWeekStart, getRecentlyUsedUrls, DEDUP_WINDOW_DAYS, getLinkedInTokenIssuedAt } from '@/lib/supabase'
 import { fetchAllFeeds } from '@/lib/rss'
 import { summarizeAndTagStories, generateDigestIntro, generateSubjectTeaser, generateLinkedInHashtags } from '@/lib/gemini'
 import { getActiveSubscribers, recordFailedSends } from '@/lib/subscribers'
-import { sendWeeklyDigest, sendFailureReport } from '@/lib/email'
+import { sendWeeklyDigest, sendFailureReport, sendLinkedInFailureReport, sendLinkedInExpiryWarning } from '@/lib/email'
 import { postToLinkedIn } from '@/lib/linkedin'
 import { citationsToPlainText } from '@/lib/citations'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
+
+// LinkedIn access tokens last ~60 days and this app isn't issued a refresh token —
+// warn once we're within this many days of that cliff so re-auth happens before a post is missed.
+const LINKEDIN_TOKEN_LIFETIME_DAYS = 60
+const LINKEDIN_TOKEN_WARNING_BUFFER_DAYS = 10
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
@@ -53,7 +58,19 @@ export async function GET(req: NextRequest) {
       await postToLinkedIn(citationsToPlainText(summary), hashtags)
       console.log('[Cron] LinkedIn post published')
     } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
       console.error('[Cron] LinkedIn post failed:', err)
+      await sendLinkedInFailureReport(weekStart, message)
+    }
+
+    const issuedAt = await getLinkedInTokenIssuedAt()
+    if (issuedAt) {
+      const daysSinceIssued = (Date.now() - issuedAt.getTime()) / (1000 * 60 * 60 * 24)
+      const daysRemaining = Math.round(LINKEDIN_TOKEN_LIFETIME_DAYS - daysSinceIssued)
+      if (daysRemaining <= LINKEDIN_TOKEN_WARNING_BUFFER_DAYS) {
+        console.log(`[Cron] LinkedIn token expires in ~${daysRemaining} days — sending warning`)
+        await sendLinkedInExpiryWarning(daysRemaining)
+      }
     }
 
     return NextResponse.json({ ok: true, count: summarized.length, week: weekStart, subscribers: subscribers.length, failed: failedCount })

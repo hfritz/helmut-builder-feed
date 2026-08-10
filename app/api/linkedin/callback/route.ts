@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { setLinkedInTokenIssuedAt } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,6 +35,7 @@ export async function GET(req: NextRequest) {
   }
 
   const tokens = await tokenRes.json()
+  await setLinkedInTokenIssuedAt(new Date())
 
   // Get person URN
   const userinfoRes = await fetch('https://api.linkedin.com/v2/userinfo', {
